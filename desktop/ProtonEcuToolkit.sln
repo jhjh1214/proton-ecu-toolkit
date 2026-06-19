@@ -1,0 +1,40 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProtonEcuToolkit.Core", "ProtonEcuToolkit.Core\ProtonEcuToolkit.Core.csproj", "{11C4CD9E-7054-4E2C-9E9B-D63ED3959BDF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProtonEcuToolkit.Core.Tests", "ProtonEcuToolkit.Core.Tests\ProtonEcuToolkit.Core.Tests.csproj", "{41741E90-81BE-4142-8C8B-82F0480E7977}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProtonEcuToolkit.App", "ProtonEcuToolkit.App\ProtonEcuToolkit.App.csproj", "{C53EBD5B-26E8-478A-AF0B-C8CD9ACA9206}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProtonEcuToolkit.HardwareProbe", "ProtonEcuToolkit.HardwareProbe\ProtonEcuToolkit.HardwareProbe.csproj", "{828159EA-A878-4B2C-89FE-8854F686EE3E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{11C4CD9E-7054-4E2C-9E9B-D63ED3959BDF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{11C4CD9E-7054-4E2C-9E9B-D63ED3959BDF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{11C4CD9E-7054-4E2C-9E9B-D63ED3959BDF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{11C4CD9E-7054-4E2C-9E9B-D63ED3959BDF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{41741E90-81BE-4142-8C8B-82F0480E7977}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{41741E90-81BE-4142-8C8B-82F0480E7977}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{41741E90-81BE-4142-8C8B-82F0480E7977}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{41741E90-81BE-4142-8C8B-82F0480E7977}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C53EBD5B-26E8-478A-AF0B-C8CD9ACA9206}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C53EBD5B-26E8-478A-AF0B-C8CD9ACA9206}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C53EBD5B-26E8-478A-AF0B-C8CD9ACA9206}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C53EBD5B-26E8-478A-AF0B-C8CD9ACA9206}.Release|Any CPU.Build.0 = Release|Any CPU
+		{828159EA-A878-4B2C-89FE-8854F686EE3E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{828159EA-A878-4B2C-89FE-8854F686EE3E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{828159EA-A878-4B2C-89FE-8854F686EE3E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{828159EA-A878-4B2C-89FE-8854F686EE3E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

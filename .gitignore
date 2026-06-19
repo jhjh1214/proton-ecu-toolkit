@@ -4,3 +4,8 @@ web/dist/
 *.log
 .env
 .env.local
+
+# .NET
+desktop/**/bin/
+desktop/**/obj/
+desktop/publish/

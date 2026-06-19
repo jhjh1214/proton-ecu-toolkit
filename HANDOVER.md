@@ -114,49 +114,48 @@ The original app never reads back the response to these (fire-and-forget) — yo
 
 ## 4. Chosen architecture
 
-- **Language/runtime**: Node.js + TypeScript, end to end (backend protocol engine + frontend UI). One language, strong typing for hex/byte protocol parsing, mature `serialport` package.
-- **Transport**: `serialport` npm package talking directly to the Windows COM port the ELM327 is already paired as. (Find the port via Device Manager → Ports (COM & LPT), or `mode` in cmd, or list via `serialport`'s own `SerialPort.list()` helper.)
-- **UI shell**: local web UI — a small backend (Express or Fastify + a WebSocket, e.g. `ws`) serves a REST+WebSocket API; a Vite + TypeScript frontend renders it in a normal browser tab. No Electron packaging needed up front; can wrap later without touching the engine if you ever want a "real app" icon.
-- **Why not mobile**: you're VS Code-only, the adapter is already a Windows COM port, and desktop gives a vastly better loop for the brute-force scanning/logging work ahead.
+**Revised 2026-06-20.** The project started as Node.js + TypeScript with a local web UI (Express/WebSocket backend, React frontend in a browser tab) - see §4.1 below for why, and it's the reason `src/` and `web/` still exist in this repo. Phase 0 and Phase 1 were fully built and validated against real hardware in that stack (engine running, both the init sequence and all 5 known PIDs confirmed correct). But the deliverable needed to be a genuinely native desktop app - no web rendering technology at all, not even packaged invisibly (i.e. not Electron/Tauri) - so the protocol engine was ported to C#/.NET, faithfully, byte-for-byte, now that every formula and timing assumption was already a hardware-confirmed fact rather than decompile theory. The TS/web code is left in place as a validated reference, not deleted; it's not under active development.
 
-## 5. Proposed project structure
+- **Language/runtime**: C#/.NET 8, WPF for the UI (MVVM via `CommunityToolkit.Mvvm`).
+- **Transport**: `System.IO.Ports.SerialPort` talking directly to the Windows COM port the ELM327 is paired as (no Bluetooth-specific API needed - Windows already exposes the paired SPP connection as a COM port, same as the original Node version's `serialport` package did). On this hardware that's **COM4** (the "outgoing" port bound to the adapter's MAC address; COM3 is the generic Bluetooth "incoming" port Windows also creates and isn't the one to use).
+- **App shell**: no server, no IPC, no serialization. The WPF `MainViewModel` owns one `KwpSession` instance in-process and subscribes to its events directly. Packaged via `dotnet publish -r win-x64 --self-contained true -p:PublishSingleFile=true` - a single standalone `.exe`, no .NET runtime install required on the target machine, no internet connection needed ever.
+- **Why not Electron/Tauri**: both still render the UI with HTML/CSS under the hood, just invisibly packaged - the requirement was no web tech at all, not just no visible browser tab.
+- **Why not mobile (yet)**: explicitly deferred by design - if it happens later, .NET MAUI can share the C# `Core` class library's business logic with this desktop app.
+
+### 4.1 Original (superseded) reasoning for Node/TS + web
+
+Kept for history: Node + TypeScript end-to-end gave strong typing for hex/byte protocol parsing and a mature `serialport` package; a local Express/WebSocket backend + Vite/React frontend in a browser tab was fast to build and avoided Electron packaging up front. This reasoning was sound for what it optimized for (iteration speed while reverse-engineering was still unverified) - it just stopped matching the actual deliverable once Phase 0/1 were proven and the desktop-native requirement became explicit.
+
+## 5. Project structure
 
 ```
 proton-ecu-toolkit/
-├── package.json
-├── tsconfig.json
-├── README.md                      (= this handover doc, updated as you go)
-├── src/
-│   ├── server/
-│   │   ├── index.ts                # entry point: boots HTTP+WS server
-│   │   ├── transport/
-│   │   │   └── SerialTransport.ts  # open/close/write COM port, buffers reads until the ELM327 '>' prompt
-│   │   ├── elm/
-│   │   │   └── ElmClient.ts        # AT command layer: sendCommand(cmd, timeoutMs) -> raw response string
-│   │   ├── kwp/
-│   │   │   ├── KwpSession.ts       # connection state machine: Disconnected/Connecting/Connected/Error,
-│   │   │   │                       #   runs the init sequence (§3.2) + keep-alive timer (§3.3) + reconnect
-│   │   │   ├── knownPids.ts        # the §3.4 table: id, name, units, formula, min/max
-│   │   │   └── PidReader.ts        # send a known PID request, parse response, apply formula
-│   │   ├── scanner/
-│   │   │   ├── PidScanner.ts       # brute-force identifier discovery (see §6 below)
-│   │   │   └── ResponseClassifier.ts # positive (62+data) / negative (7F+NRC) / no-data / garbage
-│   │   ├── api/
-│   │   │   ├── rest.ts             # /connect /disconnect /status /pids /scan/start /scan/stop /scan/results
-│   │   │   └── ws.ts                # push live telemetry + live scan progress to the frontend
-│   │   └── storage/
-│   │       └── ScanResultStore.ts  # append-only JSONL log of every scan request/response, with timestamps
-│   └── shared/
-│       └── types.ts                 # PidDefinition, ScanResult, ConnectionState — shared with frontend
-├── web/                              # Vite + TS frontend
-│   ├── index.html
-│   ├── main.ts
-│   └── components/                  # connection panel, live gauges, scanner control + results table, log console
+├── HANDOVER.md
+├── desktop/                                  # current development - C#/.NET WPF app
+│   ├── ProtonEcuToolkit.sln
+│   ├── ProtonEcuToolkit.Core/                # class library, no UI dependency
+│   │   ├── Transport/SerialTransport.cs      # open/close/write COM port, buffers reads until the '>' prompt
+│   │   ├── Elm/ElmClient.cs                  # AT command layer: SendCommandAsync/SendCommandUntilOkAsync
+│   │   ├── Models/                           # ConnectionState, PidReading, DtcActionResult
+│   │   └── Kwp/
+│   │       ├── Protocol.cs                   # Service 0x22 request/response hex encode-decode
+│   │       ├── Dtc.cs                        # §3.7 DTC scan/clear request/response hex encode-decode
+│   │       ├── KnownPids.cs, PidDefinition.cs # the §3.4 table: id, name, unit, formula
+│   │       ├── PidReader.cs                  # send a known PID request, parse response, apply formula
+│   │       └── KwpSession.cs                 # connection state machine, init sequence (§3.2),
+│   │                                         #   keep-alive/recovery (§3.3), poll loop, DTC scan/clear
+│   ├── ProtonEcuToolkit.Core.Tests/          # xUnit - ports the original vitest suite 1:1
+│   ├── ProtonEcuToolkit.HardwareProbe/       # console smoke-test harness for manual hardware checks
+│   └── ProtonEcuToolkit.App/                 # WPF, MVVM
+│       ├── ViewModels/                       # MainViewModel (owns the KwpSession), PidGaugeViewModel
+│       ├── Gauges/                           # GaugeMath/GaugeConfig (ported) + DialGaugeControl/DigitalGaugeControl
+│       └── Views/                            # ConnectionPanelView, GaugePanelView, DtcPanelView
+├── src/server/, web/                          # original Node/TS + React prototype (§4.1) - reference only
 └── data/
-    └── scan-results/                 # CSV/JSONL output from scanner runs (the actual PID discoveries)
+    └── scan-results/                          # CSV/JSONL output from scanner runs (Phase 2, not yet built)
 ```
 
-Layering rule: `transport` knows nothing about AT commands; `elm` knows nothing about KWP2000; `kwp` knows nothing about HTTP. Each layer only talks to the one below it. This is what makes DTC/actuator features (Phase 4) a pure addition later, not a rewrite.
+Layering rule, carried over unchanged from the TS version: `Transport` knows nothing about AT commands; `Elm` knows nothing about KWP2000; `Kwp` (including `KwpSession`) knows nothing about WPF or any other UI framework - it only raises plain C# events. Each layer only talks to the one below it. This is what made the rewrite itself low-risk (the Core layers ported almost mechanically) and is what will make DTC code-decoding and Phase 2/4 features pure additions later, not rewrites.
 
 ## 6. PID/CID discovery scanner — design
 
@@ -191,9 +190,10 @@ Plan:
 
 ## 9. Setup notes
 
-- Find the COM port: Device Manager → Ports (COM & LPT) (look for the Bluetooth SPP/outgoing port for your ELM327's paired name), or enumerate via `SerialPort.list()` from the `serialport` package.
-- Scaffold: `npm init`, `typescript`, `@types/node`, `serialport`, `express` (or `fastify`), `ws`, `vite` (frontend), `vitest` (tests — especially worth unit-testing `ResponseClassifier` and the PID formulas against captured hex strings from §3.4/§3.6/§3.7, since those are easy to get subtly wrong).
+- Find the COM port: Device Manager → Ports (COM & LPT) (look for the Bluetooth SPP/outgoing port for your ELM327's paired name), or enumerate via `System.IO.Ports.SerialPort.GetPortNames()`. On this hardware that's COM4 - COM3 also shows up but is the generic Bluetooth "incoming" port, not the one bound to the adapter.
+- Scaffold (current, C#): `dotnet new sln/classlib/xunit/console/wpf`, `System.IO.Ports` and `CommunityToolkit.Mvvm` NuGet packages. See `desktop/`.
 - No checksum/header math needed anywhere in the code (§3.1) — keep the protocol layer to plain ASCII hex string building/parsing.
+- Superseded (original TS prototype, kept for reference): `npm init`, `typescript`, `@types/node`, `serialport`, `express`, `ws`, `vite`, `vitest`.
 
 ## 10. Safety notes
 

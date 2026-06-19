@@ -1,0 +1,22 @@
+<UserControl x:Class="ProtonEcuToolkit.App.Gauges.DialGaugeControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Width="170" Height="170">
+    <Border Background="#1A1A1A" BorderBrush="#333333" BorderThickness="1" CornerRadius="8" Padding="10">
+        <StackPanel>
+            <Canvas Width="120" Height="68" HorizontalAlignment="Center">
+                <Path x:Name="BackgroundArc" Stroke="#333333" StrokeThickness="10"
+                      StrokeStartLineCap="Round" StrokeEndLineCap="Round" />
+                <Path x:Name="ValueArc" Stroke="#4CAF50" StrokeThickness="10"
+                      StrokeStartLineCap="Round" StrokeEndLineCap="Round" />
+                <Line x:Name="Needle" X1="60" Y1="60" X2="60" Y2="60" Stroke="#EEEEEE" StrokeThickness="2" />
+                <Ellipse Width="6" Height="6" Canvas.Left="57" Canvas.Top="57" Fill="#EEEEEE" />
+            </Canvas>
+            <TextBlock Text="{Binding DisplayText}" Foreground="{Binding ZoneBrush}"
+                       FontSize="20" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,4,0,0" />
+            <TextBlock Text="{Binding Unit}" Foreground="#999999" FontSize="11" HorizontalAlignment="Center" />
+            <TextBlock Text="{Binding Name}" Foreground="#AAAAAA" FontSize="11" HorizontalAlignment="Center"
+                       Margin="0,2,0,0" />
+        </StackPanel>
+    </Border>
+</UserControl>

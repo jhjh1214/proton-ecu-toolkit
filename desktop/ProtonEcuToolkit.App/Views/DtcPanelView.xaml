@@ -1,0 +1,36 @@
+<UserControl x:Class="ProtonEcuToolkit.App.Views.DtcPanelView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <StackPanel Margin="0,12,0,12">
+        <TextBlock Text="Diagnostic Trouble Codes" FontSize="14" FontWeight="SemiBold" Foreground="#EEEEEE"
+                   Margin="0,0,0,6" />
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+            <Button Content="Scan for codes" Command="{Binding ScanDtcsCommand}" Margin="0,0,8,0" Padding="8,2" />
+            <Button Content="Clear codes" Command="{Binding ClearDtcsCommand}" Padding="8,2" />
+        </StackPanel>
+        <TextBlock Text="{Binding DtcScanResultText}" TextWrapping="Wrap">
+            <TextBlock.Style>
+                <Style TargetType="TextBlock">
+                    <Setter Property="Foreground" Value="#CCCCCC" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding DtcScanResultIsError}" Value="True">
+                            <Setter Property="Foreground" Value="#FF6B6B" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBlock.Style>
+        </TextBlock>
+        <TextBlock Text="{Binding DtcClearResultText}" TextWrapping="Wrap">
+            <TextBlock.Style>
+                <Style TargetType="TextBlock">
+                    <Setter Property="Foreground" Value="#CCCCCC" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding DtcClearResultIsError}" Value="True">
+                            <Setter Property="Foreground" Value="#FF6B6B" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBlock.Style>
+        </TextBlock>
+    </StackPanel>
+</UserControl>

@@ -1,0 +1,34 @@
+<UserControl x:Class="ProtonEcuToolkit.App.Views.GaugePanelView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:ProtonEcuToolkit.App.Views"
+             xmlns:gauges="clr-namespace:ProtonEcuToolkit.App.Gauges"
+             xmlns:vm="clr-namespace:ProtonEcuToolkit.App.ViewModels">
+    <UserControl.Resources>
+        <DataTemplate x:Key="DialTemplate">
+            <gauges:DialGaugeControl Margin="6" />
+        </DataTemplate>
+        <DataTemplate x:Key="DigitalTemplate">
+            <gauges:DigitalGaugeControl Margin="6" />
+        </DataTemplate>
+        <local:ThemeToTemplateConverter x:Key="ThemeToTemplateConverter"
+                                        DialTemplate="{StaticResource DialTemplate}"
+                                        DigitalTemplate="{StaticResource DigitalTemplate}" />
+    </UserControl.Resources>
+    <StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+            <Button Content="Dial" Padding="8,2" Margin="0,0,4,0"
+                    Command="{Binding SetThemeCommand}" CommandParameter="{x:Static vm:GaugeTheme.Dial}" />
+            <Button Content="Digital" Padding="8,2"
+                    Command="{Binding SetThemeCommand}" CommandParameter="{x:Static vm:GaugeTheme.Digital}" />
+        </StackPanel>
+        <ItemsControl ItemsSource="{Binding PidGauges}"
+                      ItemTemplate="{Binding Theme, Converter={StaticResource ThemeToTemplateConverter}}">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+        </ItemsControl>
+    </StackPanel>
+</UserControl>
