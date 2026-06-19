@@ -24,6 +24,15 @@ export interface PidReading {
   error?: string;
 }
 
+export interface DtcActionResult {
+  positive: boolean;
+  /** Raw, undecoded hex - see src/server/kwp/dtc.ts for why. */
+  rawHex: string;
+  nrc?: number;
+  timestamp: number;
+  error?: string;
+}
+
 export interface StatusMessage {
   type: "status";
   state: ConnectionState;

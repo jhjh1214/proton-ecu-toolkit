@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import type { ConnectionState, PidReading, ServerMessage } from "../../src/shared/types";
 
 const MAX_LOG_LINES = 50;
+const MAX_HISTORY_POINTS = 30;
 const RECONNECT_DELAY_MS = 2000;
 
 export interface ServerConnection {
@@ -10,6 +11,8 @@ export interface ServerConnection {
   detail?: string;
   port: string | null;
   readings: PidReading[];
+  /** Recent values per PID id, oldest first, capped at MAX_HISTORY_POINTS. For sparklines. */
+  history: Record<string, number[]>;
   logLines: string[];
   connect: (port: string) => Promise<void>;
   disconnect: () => Promise<void>;
@@ -21,6 +24,7 @@ export function useServerConnection(): ServerConnection {
   const [detail, setDetail] = useState<string | undefined>(undefined);
   const [port, setPort] = useState<string | null>(null);
   const [readings, setReadings] = useState<PidReading[]>([]);
+  const [history, setHistory] = useState<Record<string, number[]>>({});
   const [logLines, setLogLines] = useState<string[]>([]);
 
   const log = useCallback((line: string) => {
@@ -62,6 +66,16 @@ export function useServerConnection(): ServerConnection {
           log(`status: ${message.state}${message.detail ? ` (${message.detail})` : ""}`);
         } else if (message.type === "pids") {
           setReadings(message.readings);
+          setHistory((prev) => {
+            const next = { ...prev };
+            for (const reading of message.readings) {
+              if (reading.value === null) continue;
+              const points = [...(next[reading.id] ?? []), reading.value];
+              next[reading.id] =
+                points.length > MAX_HISTORY_POINTS ? points.slice(points.length - MAX_HISTORY_POINTS) : points;
+            }
+            return next;
+          });
         }
       });
 
@@ -101,5 +115,5 @@ export function useServerConnection(): ServerConnection {
     await fetch("/api/disconnect", { method: "POST" });
   }, []);
 
-  return { ports, state, detail, port, readings, logLines, connect, disconnect };
+  return { ports, state, detail, port, readings, history, logLines, connect, disconnect };
 }

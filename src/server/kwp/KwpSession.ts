@@ -4,7 +4,14 @@ import { ElmClient } from "../elm/ElmClient.js";
 import { PidReader } from "./PidReader.js";
 import { KNOWN_PIDS, TEST_PING_CID } from "./knownPids.js";
 import { buildReadByCidRequest, containsPositiveResponseMarker } from "./protocol.js";
-import type { ConnectionState, PidReading } from "../../shared/types.js";
+import {
+  buildDtcClearRequest,
+  buildDtcScanRequest,
+  parseDtcClearResponse,
+  parseDtcScanResponse,
+  type DtcResponse,
+} from "./dtc.js";
+import type { ConnectionState, DtcActionResult, PidReading } from "../../shared/types.js";
 
 const SETTLE_DELAY_MS = 2000;
 /** Well under the 2-4s "tester present" ceiling from HANDOVER.md §3.3. */
@@ -68,6 +75,40 @@ export class KwpSession extends EventEmitter {
     this.pidReader = null;
     this.connectedPath = null;
     this.setState("disconnected");
+  }
+
+  /** §3.7 ReadDiagnosticTroubleCodesByStatus. Codes come back as a raw, undecoded hex blob (see dtc.ts). */
+  async scanDtcs(): Promise<DtcActionResult> {
+    return this.runDtcRequest(buildDtcScanRequest(), parseDtcScanResponse);
+  }
+
+  /** §3.7 ClearDiagnosticInformation. */
+  async clearDtcs(): Promise<DtcActionResult> {
+    return this.runDtcRequest(buildDtcClearRequest(), parseDtcClearResponse);
+  }
+
+  private async runDtcRequest(
+    requestHex: string,
+    parse: (raw: string) => DtcResponse | null,
+  ): Promise<DtcActionResult> {
+    if (this.state !== "connected") {
+      throw new Error(`KwpSession: cannot send a DTC request while state is "${this.state}"`);
+    }
+    const timestamp = Date.now();
+    try {
+      const raw = await this.requireElm().sendCommand(requestHex, { timeoutMs: 2000 });
+      const parsed = parse(raw);
+      if (!parsed) {
+        return { positive: false, rawHex: raw, timestamp, error: `Unrecognized response: "${raw}"` };
+      }
+      if (!parsed.positive) {
+        const nrc = parsed.nrc !== undefined ? `0x${parsed.nrc.toString(16)}` : "unknown";
+        return { positive: false, rawHex: raw, nrc: parsed.nrc, timestamp, error: `Negative response, NRC=${nrc}` };
+      }
+      return { positive: true, rawHex: parsed.dataHex, timestamp };
+    } catch (err) {
+      return { positive: false, rawHex: "", timestamp, error: err instanceof Error ? err.message : String(err) };
+    }
   }
 
   /** Cold-start init sequence per HANDOVER.md §3.2. */

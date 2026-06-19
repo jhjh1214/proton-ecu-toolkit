@@ -36,5 +36,21 @@ export function createRestRouter(session: KwpSession): Router {
     res.json({ state: session.getState() });
   });
 
+  router.post("/dtc/scan", async (_req, res) => {
+    try {
+      res.json(await session.scanDtcs());
+    } catch (err) {
+      res.status(409).json({ error: err instanceof Error ? err.message : String(err) });
+    }
+  });
+
+  router.post("/dtc/clear", async (_req, res) => {
+    try {
+      res.json(await session.clearDtcs());
+    } catch (err) {
+      res.status(409).json({ error: err instanceof Error ? err.message : String(err) });
+    }
+  });
+
   return router;
 }
