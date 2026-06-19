@@ -1,0 +1,40 @@
+body {
+  font-family: system-ui, sans-serif;
+  background: #111;
+  color: #eee;
+  margin: 2rem;
+}
+
+h1 {
+  font-size: 1.25rem;
+}
+
+.panel {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+table {
+  border-collapse: collapse;
+  margin-bottom: 1rem;
+}
+
+td {
+  border: 1px solid #444;
+  padding: 0.4rem 0.8rem;
+}
+
+tr.error td {
+  color: #ff6b6b;
+}
+
+pre#log {
+  background: #000;
+  color: #9f9;
+  padding: 0.5rem;
+  height: 10rem;
+  overflow-y: auto;
+  font-size: 0.8rem;
+}

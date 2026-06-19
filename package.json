@@ -1,0 +1,38 @@
+{
+  "name": "proton-ecu-toolkit",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "list-ports": "tsx scripts/list-ports.ts",
+    "dev:server": "tsx watch src/server/index.ts",
+    "atz": "tsx scripts/atz-probe.ts",
+    "build:server": "tsc -p tsconfig.json",
+    "start": "node dist/server/index.js",
+    "dev:web": "vite web",
+    "build:web": "vite build web",
+    "typecheck:web": "tsc -p web/tsconfig.json",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "express": "^5.2.1",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "serialport": "^13.0.0",
+    "ws": "^8.21.0"
+  },
+  "devDependencies": {
+    "@testing-library/react": "^16.3.2",
+    "@types/express": "^5.0.6",
+    "@types/node": "^26.0.0",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@types/ws": "^8.18.1",
+    "@vitejs/plugin-react": "^6.0.2",
+    "jsdom": "^29.1.1",
+    "tsx": "^4.22.4",
+    "typescript": "^6.0.3",
+    "vite": "^8.0.16",
+    "vitest": "^4.1.9"
+  }
+}
