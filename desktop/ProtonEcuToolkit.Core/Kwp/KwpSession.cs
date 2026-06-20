@@ -88,6 +88,28 @@ public sealed class KwpSession : IDisposable
     public Task<DtcActionResult> ClearDtcsAsync() =>
         RunDtcRequestAsync(Dtc.BuildDtcClearRequest(), Dtc.ParseDtcClearResponse);
 
+    /// <summary>
+    /// Sends an arbitrary already-built request hex string and returns the
+    /// raw response, for the PID/CID scanner. Has no idea what the bytes
+    /// mean - same level of knowledge as ElmClient, just gated on being connected.
+    /// </summary>
+    public Task<string> SendRawAsync(string requestHex, int timeoutMs) =>
+        _state != ConnectionState.Connected
+            ? throw new InvalidOperationException($"KwpSession: cannot send while state is \"{_state}\"")
+            : RequireElm().SendCommandAsync(requestHex, timeoutMs);
+
+    /// <summary>Stops the regular dashboard poll loop so the scanner has the transport to itself.</summary>
+    public Task PausePollingAsync() => _state == ConnectionState.Connected ? StopPollingAsync() : Task.CompletedTask;
+
+    /// <summary>Resumes the regular dashboard poll loop after a scan finishes.</summary>
+    public void ResumePolling()
+    {
+        if (_state == ConnectionState.Connected) StartPolling();
+    }
+
+    /// <summary>Cheap re-ping, escalating to the full §3.3 recovery ladder if needed. Used as the scanner's keep-alive check.</summary>
+    public Task<bool> EnsureAliveAsync() => RecoverAsync();
+
     private async Task<DtcActionResult> RunDtcRequestAsync(string requestHex, Func<string, DtcResponse?> parse)
     {
         if (_state != ConnectionState.Connected)

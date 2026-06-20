@@ -1,0 +1,701 @@
+{
+  "description": "Nearby range (0x1000-0x12FF) candidates whose Service 0x22 response changed between two scans taken ~30 minutes apart while idling. Strong evidence these carry live telemetry, not static constants - same methodology that confirmed 1147 bit4 (A/C request) and 1148 bit5 (tank purge valve).",
+  "scan_date": "2026-06-20",
+  "first_scan_file": "scan-20260620-163152.jsonl",
+  "second_scan_file": "scan-20260620-170038.jsonl",
+  "total_candidates": 768,
+  "changed_count": 98,
+  "already_decoded_in_this_diff": {
+    "1104": "RPM: byteB*255+byteA -> 838 to 858 rpm (idle hunting)",
+    "110A": "TPS: byteA*0.39216 -> 4.3% to 5.9% (closed-throttle sensor noise)",
+    "1110": "Battery voltage: byteA*0.078431 -> 13.73V to 13.02V"
+  },
+  "changed_candidates": [
+    {
+      "identifier": "1005",
+      "first_capture": "62 10 05 45 03",
+      "first_timestamp": "2026-06-20T08:31:54.2841375+00:00",
+      "second_capture": "62 10 05 3F 03",
+      "second_timestamp": "2026-06-20T09:00:40.3775804+00:00"
+    },
+    {
+      "identifier": "1006",
+      "first_capture": "62 10 06 26 5F",
+      "first_timestamp": "2026-06-20T08:31:54.4803983+00:00",
+      "second_capture": "62 10 06 34 5F",
+      "second_timestamp": "2026-06-20T09:00:40.5887169+00:00"
+    },
+    {
+      "identifier": "100A",
+      "first_capture": "62 10 0A 5C 85",
+      "first_timestamp": "2026-06-20T08:31:55.3041048+00:00",
+      "second_capture": "62 10 0A E1 80",
+      "second_timestamp": "2026-06-20T09:00:41.4051593+00:00"
+    },
+    {
+      "identifier": "100C",
+      "first_capture": "62 10 0C 35 B0",
+      "first_timestamp": "2026-06-20T08:31:55.7255004+00:00",
+      "second_capture": "62 10 0C FF FF",
+      "second_timestamp": "2026-06-20T09:00:42.0426278+00:00"
+    },
+    {
+      "identifier": "100D",
+      "first_capture": "62 10 0D 00 00",
+      "first_timestamp": "2026-06-20T08:31:56.1591505+00:00",
+      "second_capture": "62 10 0D 0C 00",
+      "second_timestamp": "2026-06-20T09:00:42.267553+00:00"
+    },
+    {
+      "identifier": "100F",
+      "first_capture": "62 10 0F 00 40",
+      "first_timestamp": "2026-06-20T08:31:56.5831381+00:00",
+      "second_capture": "62 10 0F 30 3D",
+      "second_timestamp": "2026-06-20T09:00:42.7116027+00:00"
+    },
+    {
+      "identifier": "1013",
+      "first_capture": "62 10 13 D8 03",
+      "first_timestamp": "2026-06-20T08:31:57.4379262+00:00",
+      "second_capture": "62 10 13 E2 02",
+      "second_timestamp": "2026-06-20T09:00:43.5812516+00:00"
+    },
+    {
+      "identifier": "1021",
+      "first_capture": "62 10 21 6E 83",
+      "first_timestamp": "2026-06-20T08:32:00.5784332+00:00",
+      "second_capture": "62 10 21 41 84",
+      "second_timestamp": "2026-06-20T09:00:46.6839312+00:00"
+    },
+    {
+      "identifier": "1023",
+      "first_capture": "62 10 23 81 01",
+      "first_timestamp": "2026-06-20T08:32:01.2182933+00:00",
+      "second_capture": "62 10 23 08 01",
+      "second_timestamp": "2026-06-20T09:00:47.2991255+00:00"
+    },
+    {
+      "identifier": "1025",
+      "first_capture": "62 10 25 01 00",
+      "first_timestamp": "2026-06-20T08:32:01.6243093+00:00",
+      "second_capture": "62 10 25 00 00",
+      "second_timestamp": "2026-06-20T09:00:47.7078272+00:00"
+    },
+    {
+      "identifier": "1026",
+      "first_capture": "62 10 26 59 A8",
+      "first_timestamp": "2026-06-20T08:32:01.8245452+00:00",
+      "second_capture": "62 10 26 43 AC",
+      "second_timestamp": "2026-06-20T09:00:47.9080367+00:00"
+    },
+    {
+      "identifier": "102B",
+      "first_capture": "62 10 2B 05 04",
+      "first_timestamp": "2026-06-20T08:32:02.8521152+00:00",
+      "second_capture": "62 10 2B 01 04",
+      "second_timestamp": "2026-06-20T09:00:48.9225534+00:00"
+    },
+    {
+      "identifier": "102C",
+      "first_capture": "62 10 2C 0B A9",
+      "first_timestamp": "2026-06-20T08:32:03.0492518+00:00",
+      "second_capture": "62 10 2C 0B 89",
+      "second_timestamp": "2026-06-20T09:00:49.1176484+00:00"
+    },
+    {
+      "identifier": "102F",
+      "first_capture": "62 10 2F CD 01",
+      "first_timestamp": "2026-06-20T08:32:03.8907516+00:00",
+      "second_capture": "62 10 2F B7 01",
+      "second_timestamp": "2026-06-20T09:00:49.9488906+00:00"
+    },
+    {
+      "identifier": "1030",
+      "first_capture": "62 10 30 CA 01",
+      "first_timestamp": "2026-06-20T08:32:04.09583+00:00",
+      "second_capture": "62 10 30 B2 01",
+      "second_timestamp": "2026-06-20T09:00:50.1514848+00:00"
+    },
+    {
+      "identifier": "1032",
+      "first_capture": "62 10 32 00 00",
+      "first_timestamp": "2026-06-20T08:32:04.4994379+00:00",
+      "second_capture": "62 10 32 5E 01",
+      "second_timestamp": "2026-06-20T09:00:50.5501603+00:00"
+    },
+    {
+      "identifier": "1034",
+      "first_capture": "62 10 34 1C 00",
+      "first_timestamp": "2026-06-20T08:32:04.9119159+00:00",
+      "second_capture": "62 10 34 FD FF",
+      "second_timestamp": "2026-06-20T09:00:50.9578112+00:00"
+    },
+    {
+      "identifier": "1036",
+      "first_capture": "62 10 36 79 00",
+      "first_timestamp": "2026-06-20T08:32:05.3183005+00:00",
+      "second_capture": "62 10 36 83 00",
+      "second_timestamp": "2026-06-20T09:00:51.366594+00:00"
+    },
+    {
+      "identifier": "103B",
+      "first_capture": "62 10 3B 00 00",
+      "first_timestamp": "2026-06-20T08:32:06.6132116+00:00",
+      "second_capture": "62 10 3B 15 00",
+      "second_timestamp": "2026-06-20T09:00:52.5991968+00:00"
+    },
+    {
+      "identifier": "104C",
+      "first_capture": "62 10 4C 17 01",
+      "first_timestamp": "2026-06-20T08:32:10.3674395+00:00",
+      "second_capture": "62 10 4C 7B 01",
+      "second_timestamp": "2026-06-20T09:00:56.2567724+00:00"
+    },
+    {
+      "identifier": "104E",
+      "first_capture": "62 10 4E 00 00",
+      "first_timestamp": "2026-06-20T08:32:10.7719859+00:00",
+      "second_capture": "62 10 4E 02 00",
+      "second_timestamp": "2026-06-20T09:00:56.6744383+00:00"
+    },
+    {
+      "identifier": "104F",
+      "first_capture": "62 10 4F 44 AC",
+      "first_timestamp": "2026-06-20T08:32:10.9698181+00:00",
+      "second_capture": "62 10 4F 59 AA",
+      "second_timestamp": "2026-06-20T09:00:56.884286+00:00"
+    },
+    {
+      "identifier": "1054",
+      "first_capture": "62 10 54 01 04",
+      "first_timestamp": "2026-06-20T08:32:12.2334231+00:00",
+      "second_capture": "62 10 54 05 04",
+      "second_timestamp": "2026-06-20T09:00:58.1142172+00:00"
+    },
+    {
+      "identifier": "1055",
+      "first_capture": "62 10 55 0B 89",
+      "first_timestamp": "2026-06-20T08:32:12.4409721+00:00",
+      "second_capture": "62 10 55 0B A9",
+      "second_timestamp": "2026-06-20T09:00:58.3104319+00:00"
+    },
+    {
+      "identifier": "105D",
+      "first_capture": "62 10 5D F6 01",
+      "first_timestamp": "2026-06-20T08:32:14.305865+00:00",
+      "second_capture": "62 10 5D F6 05",
+      "second_timestamp": "2026-06-20T09:00:59.9552969+00:00"
+    },
+    {
+      "identifier": "1065",
+      "first_capture": "62 10 65 80 0B",
+      "first_timestamp": "2026-06-20T08:32:15.917378+00:00",
+      "second_capture": "62 10 65 80 0E",
+      "second_timestamp": "2026-06-20T09:01:01.8080023+00:00"
+    },
+    {
+      "identifier": "107C",
+      "first_capture": "62 10 7C E9 C0",
+      "first_timestamp": "2026-06-20T08:32:20.9933855+00:00",
+      "second_capture": "62 10 7C 9B C0",
+      "second_timestamp": "2026-06-20T09:01:06.9155436+00:00"
+    },
+    {
+      "identifier": "107E",
+      "first_capture": "62 10 7E 3E 61",
+      "first_timestamp": "2026-06-20T08:32:21.4185236+00:00",
+      "second_capture": "62 10 7E E4 60",
+      "second_timestamp": "2026-06-20T09:01:07.3331046+00:00"
+    },
+    {
+      "identifier": "1082",
+      "first_capture": "62 10 82 61 00",
+      "first_timestamp": "2026-06-20T08:32:22.4523696+00:00",
+      "second_capture": "62 10 82 62 00",
+      "second_timestamp": "2026-06-20T09:01:08.3835046+00:00"
+    },
+    {
+      "identifier": "1083",
+      "first_capture": "62 10 83 7A 00",
+      "first_timestamp": "2026-06-20T08:32:22.6587522+00:00",
+      "second_capture": "62 10 83 82 00",
+      "second_timestamp": "2026-06-20T09:01:08.5870944+00:00"
+    },
+    {
+      "identifier": "1094",
+      "first_capture": "62 10 94 9C C0",
+      "first_timestamp": "2026-06-20T08:32:26.3698498+00:00",
+      "second_capture": "62 10 94 4B C0",
+      "second_timestamp": "2026-06-20T09:01:12.2857001+00:00"
+    },
+    {
+      "identifier": "1096",
+      "first_capture": "62 10 96 54 01",
+      "first_timestamp": "2026-06-20T08:32:26.7962997+00:00",
+      "second_capture": "62 10 96 4A 01",
+      "second_timestamp": "2026-06-20T09:01:12.7131604+00:00"
+    },
+    {
+      "identifier": "1097",
+      "first_capture": "62 10 97 5D 01",
+      "first_timestamp": "2026-06-20T08:32:27.0212289+00:00",
+      "second_capture": "62 10 97 58 01",
+      "second_timestamp": "2026-06-20T09:01:12.9132804+00:00"
+    },
+    {
+      "identifier": "10A0",
+      "first_capture": "62 10 A0 AC 00",
+      "first_timestamp": "2026-06-20T08:32:29.087507+00:00",
+      "second_capture": "62 10 A0 A5 00",
+      "second_timestamp": "2026-06-20T09:01:15.0433509+00:00"
+    },
+    {
+      "identifier": "10A2",
+      "first_capture": "62 10 A2 00 7B",
+      "first_timestamp": "2026-06-20T08:32:29.5299687+00:00",
+      "second_capture": "62 10 A2 00 9C",
+      "second_timestamp": "2026-06-20T09:01:15.4625428+00:00"
+    },
+    {
+      "identifier": "10A7",
+      "first_capture": "62 10 A7 36 03",
+      "first_timestamp": "2026-06-20T08:32:30.7887648+00:00",
+      "second_capture": "62 10 A7 83 03",
+      "second_timestamp": "2026-06-20T09:01:16.6624464+00:00"
+    },
+    {
+      "identifier": "10A8",
+      "first_capture": "62 10 A8 0E 08",
+      "first_timestamp": "2026-06-20T08:32:30.9924247+00:00",
+      "second_capture": "62 10 A8 CF 07",
+      "second_timestamp": "2026-06-20T09:01:16.872353+00:00"
+    },
+    {
+      "identifier": "10AA",
+      "first_capture": "62 10 AA 4C 01",
+      "first_timestamp": "2026-06-20T08:32:31.427798+00:00",
+      "second_capture": "62 10 AA 55 01",
+      "second_timestamp": "2026-06-20T09:01:17.2834227+00:00"
+    },
+    {
+      "identifier": "10AB",
+      "first_capture": "62 10 AB 4F 01",
+      "first_timestamp": "2026-06-20T08:32:31.6299053+00:00",
+      "second_capture": "62 10 AB 5E 01",
+      "second_timestamp": "2026-06-20T09:01:17.5096222+00:00"
+    },
+    {
+      "identifier": "10B1",
+      "first_capture": "62 10 B1 26 5F",
+      "first_timestamp": "2026-06-20T08:32:33.0788665+00:00",
+      "second_capture": "62 10 B1 37 5F",
+      "second_timestamp": "2026-06-20T09:01:18.9298046+00:00"
+    },
+    {
+      "identifier": "10B2",
+      "first_capture": "62 10 B2 AE 00",
+      "first_timestamp": "2026-06-20T08:32:33.2799359+00:00",
+      "second_capture": "62 10 B2 AD 00",
+      "second_timestamp": "2026-06-20T09:01:19.1496845+00:00"
+    },
+    {
+      "identifier": "1103",
+      "first_capture": "62 11 03 7A 00",
+      "first_timestamp": "2026-06-20T08:32:51.6954694+00:00",
+      "second_capture": "62 11 03 83 00",
+      "second_timestamp": "2026-06-20T09:01:37.0761853+00:00"
+    },
+    {
+      "identifier": "1104",
+      "first_capture": "62 11 04 49 03",
+      "first_timestamp": "2026-06-20T08:32:51.8977872+00:00",
+      "second_capture": "62 11 04 5D 03",
+      "second_timestamp": "2026-06-20T09:01:37.4791293+00:00"
+    },
+    {
+      "identifier": "1106",
+      "first_capture": "62 11 06 26 5F",
+      "first_timestamp": "2026-06-20T08:32:52.299216+00:00",
+      "second_capture": "62 11 06 38 5F",
+      "second_timestamp": "2026-06-20T09:01:37.8777756+00:00"
+    },
+    {
+      "identifier": "1107",
+      "first_capture": "62 11 07 58 00",
+      "first_timestamp": "2026-06-20T08:32:52.5157066+00:00",
+      "second_capture": "62 11 07 87 00",
+      "second_timestamp": "2026-06-20T09:01:38.0775896+00:00"
+    },
+    {
+      "identifier": "1108",
+      "first_capture": "62 11 08 43 AD",
+      "first_timestamp": "2026-06-20T08:32:52.9253925+00:00",
+      "second_capture": "62 11 08 5A AC",
+      "second_timestamp": "2026-06-20T09:01:38.2913251+00:00"
+    },
+    {
+      "identifier": "110A",
+      "first_capture": "62 11 0A 0B 00",
+      "first_timestamp": "2026-06-20T08:32:53.3416875+00:00",
+      "second_capture": "62 11 0A 0F 00",
+      "second_timestamp": "2026-06-20T09:01:38.7228102+00:00"
+    },
+    {
+      "identifier": "110B",
+      "first_capture": "62 11 0B AF 01",
+      "first_timestamp": "2026-06-20T08:32:53.5571497+00:00",
+      "second_capture": "62 11 0B D7 01",
+      "second_timestamp": "2026-06-20T09:01:38.924121+00:00"
+    },
+    {
+      "identifier": "110D",
+      "first_capture": "62 11 0D 14 01",
+      "first_timestamp": "2026-06-20T08:32:53.9566388+00:00",
+      "second_capture": "62 11 0D 87 01",
+      "second_timestamp": "2026-06-20T09:01:39.3490572+00:00"
+    },
+    {
+      "identifier": "1110",
+      "first_capture": "62 11 10 AF 00",
+      "first_timestamp": "2026-06-20T08:32:54.6059925+00:00",
+      "second_capture": "62 11 10 A6 00",
+      "second_timestamp": "2026-06-20T09:01:40.1617014+00:00"
+    },
+    {
+      "identifier": "1113",
+      "first_capture": "62 11 13 00 02",
+      "first_timestamp": "2026-06-20T08:32:55.4212101+00:00",
+      "second_capture": "62 11 13 00 01",
+      "second_timestamp": "2026-06-20T09:01:40.7968041+00:00"
+    },
+    {
+      "identifier": "1115",
+      "first_capture": "62 11 15 71 00",
+      "first_timestamp": "2026-06-20T08:32:55.8355629+00:00",
+      "second_capture": "62 11 15 72 00",
+      "second_timestamp": "2026-06-20T09:01:41.2065866+00:00"
+    },
+    {
+      "identifier": "1116",
+      "first_capture": "62 11 16 38 00",
+      "first_timestamp": "2026-06-20T08:32:56.0381506+00:00",
+      "second_capture": "62 11 16 39 00",
+      "second_timestamp": "2026-06-20T09:01:41.4377424+00:00"
+    },
+    {
+      "identifier": "1117",
+      "first_capture": "62 11 17 9F 00",
+      "first_timestamp": "2026-06-20T08:32:56.250495+00:00",
+      "second_capture": "62 11 17 98 00",
+      "second_timestamp": "2026-06-20T09:01:41.6502948+00:00"
+    },
+    {
+      "identifier": "1118",
+      "first_capture": "62 11 18 9C 00",
+      "first_timestamp": "2026-06-20T08:32:56.4495779+00:00",
+      "second_capture": "62 11 18 96 00",
+      "second_timestamp": "2026-06-20T09:01:41.8491279+00:00"
+    },
+    {
+      "identifier": "111B",
+      "first_capture": "62 11 1B E5 7B",
+      "first_timestamp": "2026-06-20T08:32:57.1017766+00:00",
+      "second_capture": "62 11 1B 07 7F",
+      "second_timestamp": "2026-06-20T09:01:42.6813763+00:00"
+    },
+    {
+      "identifier": "111F",
+      "first_capture": "62 11 1F 5E 00",
+      "first_timestamp": "2026-06-20T08:32:58.1193089+00:00",
+      "second_capture": "62 11 1F 7D 00",
+      "second_timestamp": "2026-06-20T09:01:43.5062881+00:00"
+    },
+    {
+      "identifier": "1136",
+      "first_capture": "62 11 36 01 00",
+      "first_timestamp": "2026-06-20T08:33:03.3543289+00:00",
+      "second_capture": "62 11 36 00 00",
+      "second_timestamp": "2026-06-20T09:01:48.6864327+00:00"
+    },
+    {
+      "identifier": "113F",
+      "first_capture": "62 11 3F A8 C0",
+      "first_timestamp": "2026-06-20T08:33:05.2424273+00:00",
+      "second_capture": "62 11 3F A6 C0",
+      "second_timestamp": "2026-06-20T09:01:50.7858472+00:00"
+    },
+    {
+      "identifier": "1140",
+      "first_capture": "62 11 40 35 00",
+      "first_timestamp": "2026-06-20T08:33:05.4532244+00:00",
+      "second_capture": "62 11 40 29 00",
+      "second_timestamp": "2026-06-20T09:01:50.9891508+00:00"
+    },
+    {
+      "identifier": "1143",
+      "first_capture": "62 11 43 17 61",
+      "first_timestamp": "2026-06-20T08:33:06.2670599+00:00",
+      "second_capture": "62 11 43 D2 60",
+      "second_timestamp": "2026-06-20T09:01:51.6106059+00:00"
+    },
+    {
+      "identifier": "1146",
+      "first_capture": "62 11 46 61 00",
+      "first_timestamp": "2026-06-20T08:33:06.8908614+00:00",
+      "second_capture": "62 11 46 62 00",
+      "second_timestamp": "2026-06-20T09:01:52.2164788+00:00"
+    },
+    {
+      "identifier": "1161",
+      "first_capture": "62 11 61 80 0B",
+      "first_timestamp": "2026-06-20T08:33:12.8887832+00:00",
+      "second_capture": "62 11 61 80 0F",
+      "second_timestamp": "2026-06-20T09:01:58.2032943+00:00"
+    },
+    {
+      "identifier": "1166",
+      "first_capture": "62 11 66 33 CE",
+      "first_timestamp": "2026-06-20T08:33:14.1271711+00:00",
+      "second_capture": "62 11 66 33 A5",
+      "second_timestamp": "2026-06-20T09:01:59.4297385+00:00"
+    },
+    {
+      "identifier": "116A",
+      "first_capture": "62 11 6A 86 01",
+      "first_timestamp": "2026-06-20T08:33:14.9883277+00:00",
+      "second_capture": "62 11 6A 5A 01",
+      "second_timestamp": "2026-06-20T09:02:00.2606397+00:00"
+    },
+    {
+      "identifier": "1186",
+      "first_capture": "62 11 86 00 0D",
+      "first_timestamp": "2026-06-20T08:33:21.1927298+00:00",
+      "second_capture": "62 11 86 00 0F",
+      "second_timestamp": "2026-06-20T09:02:06.7330485+00:00"
+    },
+    {
+      "identifier": "11C5",
+      "first_capture": "62 11 C5 14 00",
+      "first_timestamp": "2026-06-20T08:33:35.384116+00:00",
+      "second_capture": "62 11 C5 0D 00",
+      "second_timestamp": "2026-06-20T09:02:20.6734091+00:00"
+    },
+    {
+      "identifier": "11C6",
+      "first_capture": "62 11 C6 28 00",
+      "first_timestamp": "2026-06-20T08:33:35.5967807+00:00",
+      "second_capture": "62 11 C6 10 00",
+      "second_timestamp": "2026-06-20T09:02:20.8802074+00:00"
+    },
+    {
+      "identifier": "11C7",
+      "first_capture": "62 11 C7 2D 00",
+      "first_timestamp": "2026-06-20T08:33:35.7976613+00:00",
+      "second_capture": "62 11 C7 02 00",
+      "second_timestamp": "2026-06-20T09:02:21.1059326+00:00"
+    },
+    {
+      "identifier": "11C8",
+      "first_capture": "62 11 C8 46 00",
+      "first_timestamp": "2026-06-20T08:33:35.9951783+00:00",
+      "second_capture": "62 11 C8 35 00",
+      "second_timestamp": "2026-06-20T09:02:21.3084093+00:00"
+    },
+    {
+      "identifier": "11C9",
+      "first_capture": "62 11 C9 2A 00",
+      "first_timestamp": "2026-06-20T08:33:36.2051049+00:00",
+      "second_capture": "62 11 C9 27 00",
+      "second_timestamp": "2026-06-20T09:02:21.5048041+00:00"
+    },
+    {
+      "identifier": "11D6",
+      "first_capture": "62 11 D6 42 03",
+      "first_timestamp": "2026-06-20T08:33:39.1093457+00:00",
+      "second_capture": "62 11 D6 3B 03",
+      "second_timestamp": "2026-06-20T09:02:24.2699684+00:00"
+    },
+    {
+      "identifier": "11DC",
+      "first_capture": "62 11 DC 32 00",
+      "first_timestamp": "2026-06-20T08:33:40.566588+00:00",
+      "second_capture": "62 11 DC 33 00",
+      "second_timestamp": "2026-06-20T09:02:25.6374008+00:00"
+    },
+    {
+      "identifier": "11E7",
+      "first_capture": "62 11 E7 32 03",
+      "first_timestamp": "2026-06-20T08:33:43.0503624+00:00",
+      "second_capture": "62 11 E7 44 03",
+      "second_timestamp": "2026-06-20T09:02:28.0450538+00:00"
+    },
+    {
+      "identifier": "11EE",
+      "first_capture": "62 11 EE 1A 06",
+      "first_timestamp": "2026-06-20T08:33:44.4903225+00:00",
+      "second_capture": "62 11 EE 8F 05",
+      "second_timestamp": "2026-06-20T09:02:29.4665635+00:00"
+    },
+    {
+      "identifier": "11F2",
+      "first_capture": "62 11 F2 32 01",
+      "first_timestamp": "2026-06-20T08:33:45.5443594+00:00",
+      "second_capture": "62 11 F2 38 01",
+      "second_timestamp": "2026-06-20T09:02:30.4801641+00:00"
+    },
+    {
+      "identifier": "11F8",
+      "first_capture": "62 11 F8 00 2F",
+      "first_timestamp": "2026-06-20T08:33:46.7629199+00:00",
+      "second_capture": "62 11 F8 00 D9",
+      "second_timestamp": "2026-06-20T09:02:31.6788961+00:00"
+    },
+    {
+      "identifier": "1201",
+      "first_capture": "62 12 01 4D 10",
+      "first_timestamp": "2026-06-20T08:33:48.8090741+00:00",
+      "second_capture": "62 12 01 9D ED",
+      "second_timestamp": "2026-06-20T09:02:33.7278725+00:00"
+    },
+    {
+      "identifier": "1210",
+      "first_capture": "62 12 10 AE 48",
+      "first_timestamp": "2026-06-20T08:33:52.115674+00:00",
+      "second_capture": "62 12 10 15 80",
+      "second_timestamp": "2026-06-20T09:02:36.9991895+00:00"
+    },
+    {
+      "identifier": "1220",
+      "first_capture": "62 12 20 71 4E",
+      "first_timestamp": "2026-06-20T08:33:55.8906457+00:00",
+      "second_capture": "62 12 20 48 9F",
+      "second_timestamp": "2026-06-20T09:02:40.7193928+00:00"
+    },
+    {
+      "identifier": "1221",
+      "first_capture": "62 12 21 00 46",
+      "first_timestamp": "2026-06-20T08:33:56.0955312+00:00",
+      "second_capture": "62 12 21 00 4E",
+      "second_timestamp": "2026-06-20T09:02:40.9264295+00:00"
+    },
+    {
+      "identifier": "1248",
+      "first_capture": "62 12 48 00 C3",
+      "first_timestamp": "2026-06-20T08:34:04.6496821+00:00",
+      "second_capture": "62 12 48 00 8F",
+      "second_timestamp": "2026-06-20T09:02:49.6654041+00:00"
+    },
+    {
+      "identifier": "124E",
+      "first_capture": "62 12 4E 02 00",
+      "first_timestamp": "2026-06-20T08:34:05.8612071+00:00",
+      "second_capture": "62 12 4E 01 00",
+      "second_timestamp": "2026-06-20T09:02:51.1319896+00:00"
+    },
+    {
+      "identifier": "124F",
+      "first_capture": "62 12 4F 50 6C",
+      "first_timestamp": "2026-06-20T08:34:06.058314+00:00",
+      "second_capture": "62 12 4F A1 5D",
+      "second_timestamp": "2026-06-20T09:02:51.3333079+00:00"
+    },
+    {
+      "identifier": "1258",
+      "first_capture": "62 12 58 1F 1A",
+      "first_timestamp": "2026-06-20T08:34:08.0948902+00:00",
+      "second_capture": "62 12 58 38 97",
+      "second_timestamp": "2026-06-20T09:02:53.1895545+00:00"
+    },
+    {
+      "identifier": "1268",
+      "first_capture": "62 12 68 09 E3",
+      "first_timestamp": "2026-06-20T08:34:11.7532884+00:00",
+      "second_capture": "62 12 68 09 0F",
+      "second_timestamp": "2026-06-20T09:02:56.9259654+00:00"
+    },
+    {
+      "identifier": "126F",
+      "first_capture": "62 12 6F 01 34",
+      "first_timestamp": "2026-06-20T08:34:13.1735292+00:00",
+      "second_capture": "62 12 6F 01 2A",
+      "second_timestamp": "2026-06-20T09:02:58.4330956+00:00"
+    },
+    {
+      "identifier": "1278",
+      "first_capture": "62 12 78 59 00",
+      "first_timestamp": "2026-06-20T08:34:15.1937011+00:00",
+      "second_capture": "62 12 78 62 00",
+      "second_timestamp": "2026-06-20T09:03:00.5032503+00:00"
+    },
+    {
+      "identifier": "127F",
+      "first_capture": "62 12 7F 97 58",
+      "first_timestamp": "2026-06-20T08:34:16.6222249+00:00",
+      "second_capture": "62 12 7F 8A 7D",
+      "second_timestamp": "2026-06-20T09:03:02.1571727+00:00"
+    },
+    {
+      "identifier": "1288",
+      "first_capture": "62 12 88 4E 00",
+      "first_timestamp": "2026-06-20T08:34:18.7022235+00:00",
+      "second_capture": "62 12 88 53 00",
+      "second_timestamp": "2026-06-20T09:03:04.222099+00:00"
+    },
+    {
+      "identifier": "129E",
+      "first_capture": "62 12 9E A7 D2",
+      "first_timestamp": "2026-06-20T08:34:23.6540931+00:00",
+      "second_capture": "62 12 9E 49 B9",
+      "second_timestamp": "2026-06-20T09:03:09.2795036+00:00"
+    },
+    {
+      "identifier": "12A8",
+      "first_capture": "62 12 A8 4F 00",
+      "first_timestamp": "2026-06-20T08:34:25.9087524+00:00",
+      "second_capture": "62 12 A8 5F 00",
+      "second_timestamp": "2026-06-20T09:03:11.3447969+00:00"
+    },
+    {
+      "identifier": "12AD",
+      "first_capture": "62 12 AD 01 16",
+      "first_timestamp": "2026-06-20T08:34:26.9352592+00:00",
+      "second_capture": "62 12 AD 01 39",
+      "second_timestamp": "2026-06-20T09:03:12.5850282+00:00"
+    },
+    {
+      "identifier": "12AE",
+      "first_capture": "62 12 AE 32 00",
+      "first_timestamp": "2026-06-20T08:34:27.1423968+00:00",
+      "second_capture": "62 12 AE 33 00",
+      "second_timestamp": "2026-06-20T09:03:12.7947667+00:00"
+    },
+    {
+      "identifier": "12B8",
+      "first_capture": "62 12 B8 5B 00",
+      "first_timestamp": "2026-06-20T08:34:29.4691968+00:00",
+      "second_capture": "62 12 B8 57 00",
+      "second_timestamp": "2026-06-20T09:03:15.0572842+00:00"
+    },
+    {
+      "identifier": "12C8",
+      "first_capture": "62 12 C8 15 0B",
+      "first_timestamp": "2026-06-20T08:34:33.212759+00:00",
+      "second_capture": "62 12 C8 97 F0",
+      "second_timestamp": "2026-06-20T09:03:18.5823133+00:00"
+    },
+    {
+      "identifier": "12F0",
+      "first_capture": "62 12 F0 33 00",
+      "first_timestamp": "2026-06-20T08:34:42.0469949+00:00",
+      "second_capture": "62 12 F0 32 00",
+      "second_timestamp": "2026-06-20T09:03:27.7942994+00:00"
+    },
+    {
+      "identifier": "12F8",
+      "first_capture": "62 12 F8 30 03",
+      "first_timestamp": "2026-06-20T08:34:43.8806221+00:00",
+      "second_capture": "62 12 F8 31 03",
+      "second_timestamp": "2026-06-20T09:03:29.4381626+00:00"
+    }
+  ]
+}

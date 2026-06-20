@@ -5,6 +5,7 @@ using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using ProtonEcuToolkit.App.Gauges;
+using ProtonEcuToolkit.App.Scanning;
 using ProtonEcuToolkit.Core.Kwp;
 using ProtonEcuToolkit.Core.Models;
 using ProtonEcuToolkit.Core.Transport;
@@ -45,8 +46,12 @@ public partial class MainViewModel : ObservableObject, IDisposable
             RegisterGauge(new PidGaugeViewModel(settings));
         }
 
+        Scanner = new ScannerViewModel(_session, _dispatcher);
+
         RefreshPorts();
     }
+
+    public ScannerViewModel Scanner { get; }
 
     public ObservableCollection<string> Ports { get; } = [];
 
@@ -230,6 +235,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
     {
         _session.StateChanged -= OnSessionStateChanged;
         _session.PidsUpdated -= OnSessionPidsUpdated;
+        Scanner.Dispose();
         _session.Dispose();
     }
 }

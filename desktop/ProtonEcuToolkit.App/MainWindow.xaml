@@ -3,21 +3,39 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:views="clr-namespace:ProtonEcuToolkit.App.Views"
         xmlns:vm="clr-namespace:ProtonEcuToolkit.App.ViewModels"
-        Title="Proton ECU Toolkit" Height="700" Width="900"
+        Title="Proton ECU Toolkit" Height="760" Width="980"
         Background="#111111">
     <Window.DataContext>
         <vm:MainViewModel />
     </Window.DataContext>
-    <ScrollViewer Margin="16" VerticalScrollBarVisibility="Auto">
-        <StackPanel>
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0">
             <TextBlock Text="Proton ECU Toolkit" FontSize="18" FontWeight="Bold" Foreground="#EEEEEE"
                        Margin="0,0,0,12" />
             <views:ConnectionPanelView />
-            <views:GaugePanelView />
-            <views:DtcPanelView />
-            <TextBlock Text="Log" FontSize="13" FontWeight="SemiBold" Foreground="#EEEEEE" Margin="0,0,0,4" />
-            <ListBox ItemsSource="{Binding LogLines}" Height="160" Background="#000000" Foreground="#99FF99"
-                     FontFamily="Consolas" FontSize="11" BorderThickness="0" />
         </StackPanel>
-    </ScrollViewer>
+
+        <TabControl Grid.Row="1" Background="Transparent" BorderThickness="0">
+            <TabItem Header="Dashboard">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,8,0,0">
+                    <StackPanel>
+                        <views:GaugePanelView />
+                        <views:DtcPanelView />
+                        <TextBlock Text="Log" FontSize="13" FontWeight="SemiBold" Foreground="#EEEEEE"
+                                   Margin="0,0,0,4" />
+                        <ListBox ItemsSource="{Binding LogLines}" Height="160" Background="#000000"
+                                 Foreground="#99FF99" FontFamily="Consolas" FontSize="11" BorderThickness="0" />
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+            <TabItem Header="PID Scanner">
+                <views:ScannerPanelView DataContext="{Binding Scanner}" />
+            </TabItem>
+        </TabControl>
+    </Grid>
 </Window>

@@ -26,7 +26,7 @@ The adapter pairs with Windows as a normal serial COM port - no Bluetooth-specif
 - **Custom dashboard**: each gauge tile is fully user-configurable - a gear icon opens a small editor to pick which PID it shows, its min/max, and an optional redline (e.g. RPM redline, a coolant overheat threshold). Gauges can be freely added and removed, each with its own dial/digital theme, and the layout persists across launches (`%AppData%\ProtonEcuToolkit\dashboard.json`).
 - **Gauge visuals**: proper analog instrument faces (270-degree sweep, major/minor tick marks with numbers, a tapered needle, a red danger arc near the redline) and a digital-cluster-style display (segmented bar that lights up and turns red past the redline, bold numeral readout).
 - **DTC scan/clear**: wired up end-to-end and confirmed working against the real ECU, but only shows raw, undecoded hex. The OEM app's decompile documents the request bytes and the positive-response marker, never the actual fault-code byte layout - that needs a real stored DTC to reverse-engineer (the car currently has none).
-- **PID/CID scanner (Phase 2)**: not started. This is the actual long-term goal - discovering which other identifiers this ECU supports beyond the 5 hardcoded ones.
+- **PID/CID scanner (Phase 2)**: built and run against real hardware - this is the actual long-term goal. Scanned the 7 known candidates (7/7 positive) and the nearby range `0x1000`-`0x12FF` (768/768 positive - this ECU treats that whole block as a memory-mapped read window, not a validated identifier list; ~331 are `0000` filler, ~145 are a `5532` filler pattern in long contiguous runs, leaving ~292 real candidates still to investigate). Two new signals fully decoded and verified against the real car: `1147` bit 4 (A/C request, confirmed both ON and OFF) and `1148` bit 5 (tank purge valve, confirmed live/changing over time). See "Extra identifiers" below for the full bit-level table. The "Wide range" tier (`0x0000`-`0x1FFF`, 8192 candidates) hasn't been run yet.
 - **Actuator test panel (Phase 4)**: not started (fan/injector toggle via IO control).
 
 ## Architecture
@@ -48,15 +48,17 @@ proton-ecu-toolkit/
 │   │       ├── KnownPids.cs, PidDefinition.cs # the 5 known PIDs: id, name, unit, formula
 │   │       ├── PidReader.cs                   # send + parse + decode a known PID
 │   │       └── KwpSession.cs                  # connection state machine, init sequence, keep-alive, poll loop
+│   │   └── Scanning/                          # PidScanner, ResponseClassifier, ScanPlans - Service 0x22 only
 │   ├── ProtonEcuToolkit.Core.Tests/           # xUnit, ports the original vitest suite 1:1
 │   ├── ProtonEcuToolkit.HardwareProbe/        # console harness for manual hardware checks
 │   └── ProtonEcuToolkit.App/                  # WPF UI (MVVM via CommunityToolkit.Mvvm)
 │       ├── ViewModels/                        # MainViewModel owns one KwpSession in-process - no server, no IPC
 │       ├── Gauges/                            # custom dashboard: per-gauge PID/min/max/redline/theme,
 │       │                                       #   persisted to %AppData%\ProtonEcuToolkit\dashboard.json
-│       └── Views/                             # connection panel, gauge panel, DTC panel
+│       ├── Scanning/                          # ScannerViewModel, JSONL log writer
+│       └── Views/                             # connection panel, gauge panel, DTC panel, scanner panel
 ├── src/server/, web/                          # original Node/TS + React prototype - reference only, see below
-└── data/scan-results/                          # CSV/JSONL output from scanner runs (Phase 2, not yet built)
+└── data/scan-results/                          # superseded - scan output now lives in %AppData%\ProtonEcuToolkit\scan-results\
 ```
 
 The layering is what made the rewrite low-risk: `Transport` knows nothing about AT commands, `Elm` knows nothing about KWP2000, and `Kwp` (including `KwpSession`) knows nothing about WPF or any UI framework - it only raises plain C# events. Each layer only talks to the one below it. This is also what will make DTC code-decoding and the Phase 2/4 features pure additions later, not rewrites.
@@ -114,14 +116,44 @@ Response shape: `62 <2-byte CID echo> <byteA> [byteB]`. E.g. requesting `221101`
 
 The +0x57 offset is corroborated by the resulting real IDs (`0x1101`, `0x1104`, `0x110A`, `0x1110`, `0x1113`) clustering tightly with two other confirmed-real identifiers: the test ping `0x111F`, and the candidate groups below - **and** by every decoded value matching physical reality live (coolant warming up, RPM at a sane idle, battery voltage tracking the alternator's charging state).
 
-### Likely-real extra identifiers (high-value scan targets for Phase 2)
+### Extra identifiers from leftover CSVs - confirmed real, partly decoded (Phase 2 result)
 
-Two CSVs ship in the APK (`diagstatus1.csv`, `signalstatus.csv`) but are **not wired into any code path** in this Free build - almost certainly Pro-only leftovers, but they tell us real identifiers the ECU likely supports:
+Two CSVs ship in the APK (`diagstatus1.csv`, `signalstatus.csv`) but are **not wired into any code path** in this Free build - almost certainly Pro-only leftovers. **Confirmed on real hardware, 2026-06-20: all 7 respond positively under Service 0x22, exactly like the 5 known PIDs** (no +0x57 offset needed - these are already the wire-format CIDs). Each is a 2-byte bitfield, one bit per row in its CSV, decoded directly from the original CSV content (`resources/res/raw/diagstatus1.csv` and `signalstatus.csv` in the decompile):
 
-- `1147`, `1148`, `1149` - digital I/O / signal status bytes (idle switch, full load, gear position, A/C request, VIM/CPS position, clutch switch, cam control, knock control, tank purge valve, lambda controllers, cat heating, fuel cutoff, etc. - each is a bitfield, one bit per row in the CSV)
-- `11CC`, `11CD`, `11CE`, `11CF` - onboard diagnostic test status bitfields (catalyst, lambda probe, EGR, misfire, knock sensor check, etc.)
+| CID | Bit | Signal | 0 | 1 |
+|---|---|---|---|---|
+| `1147` | 0 | LLK (idle contact) | opened | closed |
+| `1147` | 1 | Full Load | not active | active |
+| `1147` | 2 | Gear lever position | D | P/N |
+| `1147` | 4 | **Air conditioning request** | OFF | **ON** |
+| `1147` | 5 | VIM position | OFF | ON |
+| `1147` | 6 | CPS position | OFF | ON |
+| `1147` | 7 | Clutch Switch | not declutched | declutched |
+| `1148` | 1 | Camshaft control active | OFF | active |
+| `1148` | 2 | Intake manifold control valve | OFF | active |
+| `1148` | 3 | Knock control status | forbidden | allowed |
+| `1148` | 5 | **Tank purge valve** | OFF | **active** |
+| `1148` | 6 | Lambda controller 1 | OFF | active |
+| `1148` | 7 | Lambda controller 2 | OFF | active |
+| `1149` | 0 | End of line mode | OFF | ON |
+| `1149` | 1 | Cat heating idle (ignition) | OFF | active |
+| `1149` | 2 | Poststart (injection) | OFF | active |
+| `1149` | 3 | Fuel cut off (SAS) | OFF | active |
+| `1149` | 4 | Safety fuel shut off | OFF | active |
+| `1149` | 5 | TBA adaptation | not finished | finished |
+| `11CC`-`11CF` | various | onboard diagnostic test status (catalyst, lambda probe, EGR, misfire, knock check, etc.) | "Diagnosis performed"/"in progress" pair per bit - **bit polarity not yet confirmed**, see below | |
 
-Hypothesis to test first when the scanner is built (cheap, high value, before any brute force): these are very likely **also Service 0x22 CIDs**, same family as the 5 known PIDs (e.g. send `2211CC`, `221147`, etc.) - everything else in the app exclusively uses SID `0x22` for reads; SID `0x21` (ReadDataByLocalIdentifier) was never observed anywhere in the decompiled code. Still worth verifying both `0x22` and `0x21` against these 7 specific candidates before trusting the hypothesis - **this hasn't been tested yet**.
+The bitfield lives in byte A (the first data byte after the CID echo); byte B's meaning is undocumented by these CSVs and not yet decoded.
+
+**Two bits independently verified against the real car, not just read from the CSV:**
+- **`1147` bit 4 (A/C request)** - confirmed in both directions. Captured `0x15` (bit 4 set) while A/C was on; asked the user to turn it off, re-scanned, got `0x05` (bit 4 cleared). Flipped exactly as predicted, twice.
+- **`1148` bit 5 (Tank purge valve)** - confirmed live/changing. Two scans ~10 minutes apart while idling: `0x40` -> `0x60`, exactly bit 5 turning on - consistent with EVAP purge typically activating once the engine's been running long enough to enter closed-loop control (Lambda controller 1, bit 6, was already active in both readings).
+
+**`1147` bit 7 ("Clutch Switch") is probably not the transmission clutch pedal**, despite the CSV's label. Tested twice (clutch pedal held down, including a retry with extra buffer time to rule out timing lag) - the bit never moved. Current best hypothesis: it's actually the **A/C compressor clutch** (the electromagnetic clutch that engages the compressor), not the transmission clutch - the original CSV label is ambiguous about which "clutch" it means, and the data is at least as consistent with that reading: every capture so far had the compressor either off or not yet engaged. Testing this directly (A/C genuinely requesting cooling, compressor prevented from physically engaging) is a planned next step.
+
+The `11CC`-`11CF` 0-vs-1 polarity (which value means "performed" vs "in progress") is read directly off the CSV but hasn't been independently falsified the way the `1147`/`1148` bits have, so treat it as a working hypothesis, not confirmed.
+
+Per HANDOVER.md, everything in the app exclusively uses SID `0x22` for reads; SID `0x21` (ReadDataByLocalIdentifier) was never observed anywhere in the decompiled code and hasn't been tested.
 
 ### Diagnostic session + actuator test commands (Phase 4 material)
 
@@ -157,23 +189,22 @@ The original app never reads back the response to these (fire-and-forget) - this
 
 Only the request bytes and the positive-response marker are documented from the decompile - the actual fault-code byte layout (how many bytes per code, status byte format) is unknown, so codes are surfaced as raw hex pending a real stored-code capture to reverse-engineer against.
 
-## PID/CID discovery scanner - design (Phase 2)
+## PID/CID discovery scanner (Phase 2)
 
-This is the actual long-term goal of the project: systematically discovering which identifiers this ECU supports beyond the 5 hardcoded ones, beyond what the OEM app ever exposed.
+This is the actual long-term goal of the project: systematically discovering which identifiers this ECU supports beyond the 5 hardcoded ones, beyond what the OEM app ever exposed. **Built and run against real hardware as of 2026-06-20** - `desktop/ProtonEcuToolkit.Core/Scanning/` (`PidScanner`, `ResponseClassifier`, `ScanPlans`) plus a "PID Scanner" tab in the app (range picker, start/stop, live progress, a results table of hits, CSV export).
 
-The OEM app's approach is too slow for this directly - its read loop waits up to 1000ms before declaring "no data." Scanning a wide identifier range at 1s/candidate is impractical (65536 candidates × 1s ≈ 18 hours). Plan:
+Scoped deliberately to **Service 0x22 (ReadDataByCommonIdentifier) only** - the same read-only service the 5 known PIDs already use. No write services, no security access, no routine control, no IO control, no reflash services - reading an unsupported identifier just gets a negative response, it doesn't change ECU state, which is what keeps this safe to brute-force. SID `0x21` (ReadDataByLocalIdentifier) was never observed in the decompile and has been deliberately left out of scope for now.
 
-1. **Tune the timeout down.** A KWP2000 ECU normally returns a negative response (`7F`) for an unsupported identifier quickly (tens of ms) - it doesn't usually stay silent for a full second. Start with a ~200-300ms read timeout for scanning; only fall back to longer timeouts if false "no response" results start appearing on IDs already known to be real (the 5 known PIDs + the candidates above), as a calibration check.
-2. **Scan order, cheapest/highest-value first:**
-   - Step A: directly request the 7 known-but-unverified candidates (`1147,1148,1149,11CC,11CD,11CE,11CF`) under both SID `0x22` and SID `0x21`. 14 requests, seconds to run, immediately confirms/refutes the "everything is SID 0x22" hypothesis.
-   - Step B: scan `0x1000`-`0x12FF` (768 candidates) under SID `0x22` - the neighborhood where every confirmed-real ID lives. At ~250ms/candidate that's ~3-4 minutes.
-   - Step C: widen to `0x0000`-`0x1FFF` if B didn't already start looking sparse/done, interleaving a keep-alive request every ~2-3 seconds of scanning so the session doesn't drop mid-scan.
-   - Step D (optional/stretch): also brute-force SID `0x21` (1-byte LID, only 256 candidates, cheap).
-3. **Classify every response**: positive (`62` + CID echo + N data bytes - record N, the raw bytes, and a guessed scaling later), negative (`7F` + service + NRC byte - record the NRC, since NRCs like "request out of range" vs "conditions not correct" mean different things), no-data/timeout, or malformed.
-4. **Log everything**, not just hits - a JSONL file with `{timestamp, sid, id, requestHex, responseHex, classification, latencyMs}` per attempt. This is the raw evidence trail; the "PID database" is a filtered view of it (positive responses only), but the full log stays useful for re-analysis later (e.g. re-classifying NRCs once the ECU's NRC dialect is better understood).
-5. **UI**: a simple panel - start/stop scan, range picker, live progress bar + running count of hits, and a results table (ID, byte count, raw hex, latency) exportable to CSV. Nothing fancy needed for v1.
+The OEM app's own read loop waits up to 1000ms before declaring "no data," which is too slow to scan widely - the scanner uses a 250ms timeout instead, since the ECU returns a response (positive or negative) quickly regardless of timeout length; only genuinely no-response candidates eat the full timeout. A keep-alive check runs every ~2.5 seconds of scanning, escalating through the same §3.3 recovery ladder used elsewhere, so a long scan doesn't let the session drop.
 
-Once a candidate is confirmed positive, the actual formula behind its bytes still needs manual reverse-engineering: watch the raw bytes while changing something physically (rev the engine, open the throttle, switch on A/C) and see which newly-discovered ID's bytes move in response.
+**Results so far:**
+- **Known candidates (7)**: 7/7 positive - confirms the §3.5 hypothesis outright. See "Extra identifiers" above for the full decode.
+- **Nearby range (768, `0x1000`-`0x12FF`)**: 768/768 positive. This isn't a sparse validated identifier list the way the OEM app's 5 PIDs suggested - this ECU appears to treat the whole block as a literal memory-mapped read window, returning *something* for every offset regardless of whether it's backed by a real signal. Filtering out two filler patterns (`0000`, and `5532` appearing in long contiguous runs - both consistent with unmapped/reserved memory rather than 145 coincidentally-identical sensor readings) leaves **~292 real candidates** still needing the manual correlation step below.
+- **Wide range (8192, `0x0000`-`0x1FFF`)**: not run yet.
+
+Every attempt (positive, negative, no-response, or malformed - not just hits) is logged to `%AppData%\ProtonEcuToolkit\scan-results\scan-<timestamp>.jsonl` as the raw evidence trail; the live results table only shows positive hits, exportable to CSV via the same panel.
+
+**Confirming what a positive candidate's bytes actually mean still requires the manual step the original plan anticipated**: watch the raw bytes while changing something physically and see what moves. This is how `1147` bit 4 (A/C request) and `1148` bit 5 (tank purge valve) got confirmed - turning the A/C on/off flipped bit 4 in both directions; idling for ~10 minutes flipped `1148`'s purge-valve bit. No amount of further scanning substitutes for this.
 
 ## Building and running
 
@@ -204,8 +235,8 @@ Find the COM port via Device Manager → Ports (COM & LPT) (look for the Bluetoo
 
 1. ~~Phase 0 - proof of life~~ - done, hardware-validated.
 2. ~~Phase 1 - replicate the OEM app~~ (init sequence, keep-alive, 5 known PIDs, live dashboard) - done, hardware-validated.
-3. Native desktop rewrite (C#/.NET WPF) - code complete, pending its own hardware validation pass.
-4. **Phase 2 - PID/CID scanner**: the actual goal. Brute-force the ECU's identifier space, classify every response, log everything to CSV/JSONL as the raw evidence trail for manually reverse-engineering new PID formulas.
+3. ~~Native desktop rewrite (C#/.NET WPF)~~ - done, hardware-validated.
+4. **Phase 2 - PID/CID scanner**: the actual goal, and underway. Known candidates and the nearby range are scanned (see results above); the wide range (`0x0000`-`0x1FFF`) is still to run. The bigger remaining task is the manual correlation work - watching candidates while changing something physically - to decode the ~292 still-unidentified nearby-range hits the same way `1147`/`1148` got decoded.
 5. Phase 3 - dashboard polish (gauges already built ahead of schedule; CSV export of live sessions still to do).
 6. Phase 4 - decode the DTC byte format once a real stored code is captured; actuator test panel (fan/injector toggle via IO control), with proper response-checking added (the original app doesn't check, this one should).
 

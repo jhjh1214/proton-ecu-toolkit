@@ -9,3 +9,6 @@ web/dist/
 desktop/**/bin/
 desktop/**/obj/
 desktop/publish/
+
+# local tooling config
+.claude/
