@@ -143,7 +143,7 @@ Two CSVs ship in the APK (`diagstatus1.csv`, `signalstatus.csv`) but are **not w
 | `1149` | 5 | TBA adaptation | not finished | finished |
 | `11CC`-`11CF` | various | onboard diagnostic test status (catalyst, lambda probe, EGR, misfire, knock check, etc.) | "Diagnosis performed"/"in progress" pair per bit - **bit polarity not yet confirmed**, see below | |
 
-The bitfield lives in byte A (the first data byte after the CID echo); byte B's meaning is undocumented by these CSVs and not yet decoded.
+The bitfield lives in byte A (the first data byte after the CID echo). Byte B isn't an independent unknown signal - see the memory-mapping discovery below, it's the *next* identifier's byte A.
 
 **Two bits independently verified against the real car, not just read from the CSV:**
 - **`1147` bit 4 (A/C request)** - confirmed in both directions. Captured `0x15` (bit 4 set) while A/C was on; asked the user to turn it off, re-scanned, got `0x05` (bit 4 cleared). Flipped exactly as predicted, twice.
@@ -152,6 +152,19 @@ The bitfield lives in byte A (the first data byte after the CID echo); byte B's 
 **`1147` bit 7 ("Clutch Switch") is probably not the transmission clutch pedal**, despite the CSV's label. Tested twice (clutch pedal held down, including a retry with extra buffer time to rule out timing lag) - the bit never moved. Current best hypothesis: it's actually the **A/C compressor clutch** (the electromagnetic clutch that engages the compressor), not the transmission clutch - the original CSV label is ambiguous about which "clutch" it means, and the data is at least as consistent with that reading: every capture so far had the compressor either off or not yet engaged. Testing this directly (A/C genuinely requesting cooling, compressor prevented from physically engaging) is a planned next step.
 
 **Planned next test: `1147` bits 5/6 (VIM/CPS) via a stationary high-RPM rev**, not yet performed. Target thresholds confirmed by the user from direct experience with this car: **CPS switches at ~3800 rpm, VIM at ~4800 rpm**. Plan: car in Park/Neutral, handbrake on, foot on the brake, rev smoothly past both thresholds while watching `1147` byte A - expect bit 6 to flip first (~3800 rpm) and bit 5 second (~4800 rpm). If the bits don't flip even at a clean stationary high rev, that points to a load-dependent trigger (needs actual driving, not just RPM) - a harder problem since live-scanning while driving isn't safe to coordinate the way the stationary tests have been.
+
+### Memory-mapping discovery: the CID is a sliding 2-byte window, not an independent value
+
+Found by re-analyzing already-collected scan data, no new hardware access needed. **Byte B of CID `N` equals byte A of CID `N+1`** within a real memory block - meaning two adjacent CIDs aren't two separate readings, they're an overlapping view into the same underlying bytes. Confirmed two ways:
+
+- **`1147`-`1148`-`1149`** (the signalstatus.csv group): `1147`'s byte B always equals `1148`'s byte A, and `1148`'s byte B always equals `1149`'s byte A, across all 3 captures taken so far (different sessions, different car states) - and the chain breaks cleanly on both sides (`1146` doesn't connect in, `114A` doesn't connect out). The true underlying data is a **4-byte block** (`05 40 20 72` in the most recent capture), not 6 redundant bytes from 3 separate 2-byte reads.
+- **`11CC`-`11CF`** (the diagstatus1.csv group): same pattern, `00 02 0F 80` as one continuous 4-byte block, chain breaks cleanly before `11CC`. **Bonus finding: the block actually extends one byte further than the CSV documented** - `11D0` (never mentioned in the original decompile) genuinely continues the same chain, making the real block 5 bytes (`00 02 0F 80 00`), not 4.
+
+Both block boundaries land exactly where the original leftover CSVs grouped identifiers together - strong, independent confirmation that the CSV's groupings reflect real, physically contiguous memory, and that the CID literally addresses into that memory rather than being a validated, independent signal ID.
+
+**Scanning the rest of the nearby range for the same pattern found 24 more non-trivial chains** (3-12 IDs long) scattered through `0x1000`-`0x12FF`, each presumably marking a real, distinct sub-structure with its own boundary - e.g. `1059`-`1064` (`01 01 35 67 00 00 00`), `1088`-`1092` (a single byte `95` followed by 11 bytes of zero), `1164`-`1166` (`11 22 33 B7` - the `11,22,33` looks like it could be a firmware test/canary pattern, unconfirmed). Full list in `data/scan-results/sliding-window-chains-2026-06-21.json`.
+
+**Two of those chains contain the exact same byte sequence at two different addresses 26 bytes apart** (`08 E0 80 01` at both `1059`-`1064`'s start and `1073`-`1076`) - the same kind of aliasing already seen with the `5532`/`5512` value, now confirmed in unrelated content too. A few other short sequences (`93 00 04`, `80 00 40`, `80 80 80`) also repeat at exactly **0x29 (41) bytes apart** from each other, hinting at a possible periodic/tiled sub-structure - but checking this systematically across the *entire* range only matched 20.8% of non-zero candidates at that exact offset, well above random chance but far short of the ~100% a clean global repeating period would produce. Treat the 41-byte period as a real but localized pattern in that one region, not a universal law - don't extrapolate it across the whole range without checking.
 
 The `11CC`-`11CF` 0-vs-1 polarity (which value means "performed" vs "in progress") is read directly off the CSV but hasn't been independently falsified the way the `1147`/`1148` bits have, so treat it as a working hypothesis, not confirmed.
 

@@ -68,6 +68,15 @@ This range was chosen because every known-real ID clusters there. **Run 3 times*
 
 This is the most important structural finding: **this ECU does not validate the 2-byte CID for this range at all** - every single offset in `0x1000`-`0x12FF` returns *some* data, whether or not it's backed by a real signal. The working theory is that the ECU treats this whole block as a literal memory-mapped read window (i.e. the CID is functioning as a raw memory/table offset, not a validated signal identifier), not a sparse list of defined PIDs the way the 5-PID + 7-candidate sets are.
 
+### Confirmed: the CID is a sliding 2-byte window into contiguous memory (found via re-analysis, no new hardware access)
+
+**Byte B of CID `N` equals byte A of CID `N+1`** within a real memory block - adjacent CIDs overlap by one byte rather than being independent 2-byte readings. Verified two ways, both lining up exactly with the original decompile's CSV groupings:
+
+- `1147`-`1148`-`1149`: chains perfectly across all 3 captures taken so far, breaks cleanly on both sides (`1146` doesn't connect, `114A` doesn't connect). True underlying data is a 4-byte block (`05 40 20 72` most recently), not 6 redundant bytes.
+- `11CC`-`11CF`: same pattern, `00 02 0F 80` as one block, clean break before `11CC`. **New finding**: the block actually extends one more byte than documented - `11D0` (never in the original CSV) genuinely continues the chain, making the real block 5 bytes (`00 02 0F 80 00`).
+
+Scanning the rest of the nearby range found 24 more non-trivial chains (3-12 IDs each) scattered through the range, each presumably marking a distinct real sub-structure - full list in `data/scan-results/sliding-window-chains-2026-06-21.json`. Two chains contain the identical byte sequence (`08 E0 80 01`) at two addresses 26 bytes apart - more aliasing, same phenomenon as the `5532`/`5512` value. A few short sequences also repeat at exactly 41 (`0x29`) bytes apart from each other, but a systematic check across the whole range only matched ~20.8% of non-zero candidates at that offset - a real but localized pattern, not a confirmed global repeating period. Don't extrapolate the 41-byte period without checking it first.
+
 **Filler classification - revised, this is important:**
 - In the first session, ~331/768 returned `0000` and ~145/768 returned the exact value `5532`, in long contiguous runs of consecutive addresses. Both were classified as "filler/padding" (unmapped memory returning a default value).
 - **The `5532` classification turned out to be wrong.** In the third capture (~8 hours after the first two), several of those exact identifiers (`1008`, `1016`, `102D`, `103F`, `1056`, `1071`, `1072`, and others) all shifted from `5532` to `5512` - the *same* byte delta, across many different addresses, simultaneously. That's not 145 independent sensors coincidentally matching, and it's not random noise either (random noise wouldn't move every instance by the exact same amount at once) - it looks like one real, slow-changing or counter-like underlying value that's aliased/mirrored across many different CID addresses in this block.
@@ -88,7 +97,8 @@ This is the most important structural finding: **this ECU does not validate the 
 - **SID 0x21** (ReadDataByLocalIdentifier) - never observed in the original decompile, never tested at all. Everything above is SID `0x22` only.
 - **Stationary high-RPM test** for `1147` bits 5/6 (VIM/CPS) - rev the engine hard while parked (handbrake on, in neutral/park) past the confirmed thresholds (CPS ~3800 rpm, VIM ~4800 rpm - confirmed by the owner from direct experience with this car) to see if these RPM-threshold mechanisms trigger without needing to actually drive. Expect bit 6 (CPS) to flip first, bit 5 (VIM) second.
 - **Direct on/off correlation testing** of the 17 unconfirmed single-bit-flip candidates from the classification above, the same way A/C and the purge valve got confirmed.
-- Figuring out what's actually behind the `5532`/`5512`-shifting aliased value (confirmed to span exactly 145 of the 768 nearby-range identifiers, full list in `nearby-range-classification-2026-06-20.json`/`nearby-range-third-capture-diff-2026-06-21.json`), and what byte B means across all of these identifiers (it's never been the focus of decoding so far, only byte A).
+- Figuring out what's actually behind the `5532`/`5512`-shifting aliased value (confirmed to span exactly 145 of the 768 nearby-range identifiers, full list in `nearby-range-classification-2026-06-20.json`/`nearby-range-third-capture-diff-2026-06-21.json`).
+- Byte B's meaning is now mostly explained (it's the next CID's byte A, see the sliding-window finding above) - what's still open is finding the boundaries and meaning of the other 22 non-trivial chains in `sliding-window-chains-2026-06-21.json` that aren't part of an already-decoded group.
 
 ## Questions this summary is meant to prompt help with
 
