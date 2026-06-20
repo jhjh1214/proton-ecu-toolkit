@@ -23,8 +23,8 @@ public static class GaugeMath
 
     public static Color ColorForZone(GaugeZone zone) => zone switch
     {
-        GaugeZone.Ok => Color.FromRgb(0x4c, 0xaf, 0x50),
-        GaugeZone.Danger => Color.FromRgb(0xe5, 0x53, 0x53),
+        GaugeZone.Ok => Color.FromRgb(0xf2, 0xf2, 0xf2),
+        GaugeZone.Danger => Color.FromRgb(0xe5, 0x35, 0x35),
         _ => throw new ArgumentOutOfRangeException(nameof(zone)),
     };
 }
