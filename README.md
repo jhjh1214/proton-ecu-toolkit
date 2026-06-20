@@ -206,6 +206,16 @@ Every attempt (positive, negative, no-response, or malformed - not just hits) is
 
 **Confirming what a positive candidate's bytes actually mean still requires the manual step the original plan anticipated**: watch the raw bytes while changing something physically and see what moves. This is how `1147` bit 4 (A/C request) and `1148` bit 5 (tank purge valve) got confirmed - turning the A/C on/off flipped bit 4 in both directions; idling for ~10 minutes flipped `1148`'s purge-valve bit. No amount of further scanning substitutes for this.
 
+### Triaging candidates without hardware access
+
+Re-running the same scan some time later and diffing the two captures is a cheap way to separate live signals from static constants even without a deliberate physical test - this is how the 98-candidate list (`data/scan-results/nearby-range-live-candidates-2026-06-20.json`) was found. Classifying *how* each one changed narrows the list further (`data/scan-results/nearby-range-classification-2026-06-20.json`):
+
+- **Single-bit flip (18)** - the strongest, cheapest-to-verify signal, the same pattern that found `1147`/`1148`'s bits. Caveat: this is a heuristic, not proof - `110A` (TPS, a known *analog* PID) produced a single-bit-looking delta purely by coincidence (its noise happened to step by exactly 4). Treat hits as priority candidates for direct on/off correlation testing next time, not as confirmed flags.
+- **Small multi-bit drift (37)** - consistent with continuous analog sensor noise; this is where the already-known RPM/TPS/battery PIDs land in this same diff, which is reassuring evidence the classification approach works.
+- **Large jump (43)** - counters, timers, multi-byte values, or just unclear without more data.
+
+One dead end worth recording so it doesn't get retried: applying the 5 known PIDs' formulas (e.g. `byteA-60` for coolant) to every *other* candidate and checking if the result lands in a physically plausible range matched 276 of 768 candidates - the value ranges just overlap too much for that check to mean anything on its own, without an independent signal like the diff-over-time approach above.
+
 ## Building and running
 
 Requires the .NET 8 SDK.
