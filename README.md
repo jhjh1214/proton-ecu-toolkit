@@ -23,6 +23,7 @@ The adapter pairs with Windows as a normal serial COM port - no Bluetooth-specif
 - **Phase 0 - proof of life**: done and hardware-validated. Opening the COM port and sending a bare `ATZ` returns `ELM327 v1.5`.
 - **Phase 1 - replicate the OEM app**: done and hardware-validated, live, with the engine running. The full KWP2000 init sequence, the keep-alive/recovery pattern, and all 5 known PIDs were confirmed against the real ECU - decoded values were physically sane (coolant temp rising as the engine warmed, RPM at a believable idle, battery voltage jumping from 11.8V to 14V+ once the alternator started charging, matching the ELM327's own `ATRV` voltage sense as an independent cross-check).
 - **Native desktop rewrite (C#/.NET WPF)**: code-complete. Every protocol fact proven in Phase 0/1 was ported faithfully from the original TypeScript prototype to C#, byte-for-byte. Verified via 25/25 passing unit tests (ported 1:1 from the original suite, same inputs/outputs) and the app launches cleanly with zero binding/runtime errors, but **the WPF app itself has not yet been run against the real ECU** - only its TypeScript predecessor has.
+- **Custom dashboard**: each gauge tile is fully user-configurable - a gear icon opens a small editor to pick which PID it shows, its min/max, and an optional redline (e.g. RPM redline, a coolant overheat threshold). Gauges can be freely added and removed, each with its own dial/digital theme, and the layout persists across launches (`%AppData%\ProtonEcuToolkit\dashboard.json`).
 - **DTC scan/clear**: wired up end-to-end, but only shows raw, undecoded hex. The OEM app's decompile documents the request bytes and the positive-response marker, never the actual fault-code byte layout - that needs a real ECU response with a stored code to reverse-engineer.
 - **PID/CID scanner (Phase 2)**: not started. This is the actual long-term goal - discovering which other identifiers this ECU supports beyond the 5 hardcoded ones.
 - **Actuator test panel (Phase 4)**: not started (fan/injector toggle via IO control).
@@ -50,7 +51,8 @@ proton-ecu-toolkit/
 │   ├── ProtonEcuToolkit.HardwareProbe/        # console harness for manual hardware checks
 │   └── ProtonEcuToolkit.App/                  # WPF UI (MVVM via CommunityToolkit.Mvvm)
 │       ├── ViewModels/                        # MainViewModel owns one KwpSession in-process - no server, no IPC
-│       ├── Gauges/                            # dial + digital gauge themes, per-PID color zones
+│       ├── Gauges/                            # custom dashboard: per-gauge PID/min/max/redline/theme,
+│       │                                       #   persisted to %AppData%\ProtonEcuToolkit\dashboard.json
 │       └── Views/                             # connection panel, gauge panel, DTC panel
 ├── src/server/, web/                          # original Node/TS + React prototype - reference only, see below
 └── data/scan-results/                          # CSV/JSONL output from scanner runs (Phase 2, not yet built)

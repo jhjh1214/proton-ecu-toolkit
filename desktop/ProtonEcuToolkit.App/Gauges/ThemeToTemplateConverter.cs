@@ -1,9 +1,8 @@
 using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
-using ProtonEcuToolkit.App.ViewModels;
 
-namespace ProtonEcuToolkit.App.Views;
+namespace ProtonEcuToolkit.App.Gauges;
 
 public sealed class ThemeToTemplateConverter : IValueConverter
 {

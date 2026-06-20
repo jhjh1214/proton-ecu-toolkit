@@ -1,28 +1,34 @@
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using ProtonEcuToolkit.App.Gauges;
 using ProtonEcuToolkit.Core.Kwp;
 using ProtonEcuToolkit.Core.Models;
 using ProtonEcuToolkit.Core.Transport;
 
 namespace ProtonEcuToolkit.App.ViewModels;
 
-public enum GaugeTheme
-{
-    Dial,
-    Digital,
-}
-
 /// <summary>
 /// Owns one KwpSession in-process - no server, no IPC, no serialization.
 /// Replaces what used to be useServerConnection.ts plus the entire REST/WS
-/// API layer in the web prototype.
+/// API layer in the web prototype. Also owns the user's custom dashboard
+/// layout (which gauges exist, what each shows) and persists it.
 /// </summary>
 public partial class MainViewModel : ObservableObject, IDisposable
 {
     private const int MaxLogLines = 50;
+
+    private static readonly HashSet<string> PersistedGaugePropertyNames =
+    [
+        nameof(PidGaugeViewModel.Id),
+        nameof(PidGaugeViewModel.Min),
+        nameof(PidGaugeViewModel.Max),
+        nameof(PidGaugeViewModel.Redline),
+        nameof(PidGaugeViewModel.Theme),
+    ];
 
     private readonly KwpSession _session = new();
     private readonly Dispatcher _dispatcher;
@@ -34,9 +40,9 @@ public partial class MainViewModel : ObservableObject, IDisposable
         _session.StateChanged += OnSessionStateChanged;
         _session.PidsUpdated += OnSessionPidsUpdated;
 
-        foreach (var pid in KnownPids.All)
+        foreach (var settings in GaugeSettingsStore.Load())
         {
-            PidGauges.Add(new PidGaugeViewModel(pid.Id, pid.Name, pid.Unit));
+            RegisterGauge(new PidGaugeViewModel(settings));
         }
 
         RefreshPorts();
@@ -63,9 +69,6 @@ public partial class MainViewModel : ObservableObject, IDisposable
     public string StatusText => StatusDetail is not null ? $"{State} ({StatusDetail})" : State.ToString();
 
     [ObservableProperty]
-    private GaugeTheme _theme = GaugeTheme.Dial;
-
-    [ObservableProperty]
     private string? _dtcScanResultText;
 
     [ObservableProperty]
@@ -86,7 +89,11 @@ public partial class MainViewModel : ObservableObject, IDisposable
         !IsBusy && State is ConnectionState.Disconnected or ConnectionState.Error && SelectedPort is not null;
 
     [RelayCommand]
-    private void SetTheme(GaugeTheme theme) => Theme = theme;
+    private void AddGauge()
+    {
+        RegisterGauge(PidGaugeViewModel.CreateDefault(KnownPids.All[0].Id));
+        PersistGauges();
+    }
 
     [RelayCommand]
     private void RefreshPorts()
@@ -170,11 +177,36 @@ public partial class MainViewModel : ObservableObject, IDisposable
         {
             foreach (var reading in readings)
             {
-                var gauge = PidGauges.FirstOrDefault(g => g.Id == reading.Id);
-                gauge?.ApplyReading(reading);
+                foreach (var gauge in PidGauges.Where(g => g.Id == reading.Id))
+                {
+                    gauge.ApplyReading(reading);
+                }
             }
         });
     }
+
+    private void RegisterGauge(PidGaugeViewModel gauge)
+    {
+        gauge.RemoveRequested += OnGaugeRemoveRequested;
+        gauge.PropertyChanged += OnGaugeSettingsChanged;
+        PidGauges.Add(gauge);
+    }
+
+    private void OnGaugeRemoveRequested(PidGaugeViewModel gauge)
+    {
+        gauge.RemoveRequested -= OnGaugeRemoveRequested;
+        gauge.PropertyChanged -= OnGaugeSettingsChanged;
+        PidGauges.Remove(gauge);
+        PersistGauges();
+    }
+
+    private void OnGaugeSettingsChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName is null || !PersistedGaugePropertyNames.Contains(e.PropertyName)) return;
+        PersistGauges();
+    }
+
+    private void PersistGauges() => GaugeSettingsStore.Save(PidGauges.Select(g => g.ToSettings()));
 
     private void NotifyCommandsCanExecuteChanged()
     {

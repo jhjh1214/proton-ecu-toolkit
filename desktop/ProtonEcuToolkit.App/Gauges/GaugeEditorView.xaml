@@ -1,0 +1,27 @@
+<UserControl x:Class="ProtonEcuToolkit.App.Gauges.GaugeEditorView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Border Background="#222222" BorderBrush="#444444" BorderThickness="1" CornerRadius="6" Padding="10" Width="180">
+        <StackPanel>
+            <TextBlock Text="PID" Foreground="#999999" FontSize="10" />
+            <ComboBox ItemsSource="{Binding AvailablePids}" SelectedValue="{Binding Id}"
+                      SelectedValuePath="Id" DisplayMemberPath="Name" Margin="0,2,0,8"
+                      AutomationProperties.AutomationId="PidComboBox" />
+            <TextBlock Text="Min" Foreground="#999999" FontSize="10" />
+            <TextBox Text="{Binding Min}" Margin="0,2,0,8" AutomationProperties.AutomationId="MinTextBox" />
+            <TextBlock Text="Max" Foreground="#999999" FontSize="10" />
+            <TextBox Text="{Binding Max}" Margin="0,2,0,8" AutomationProperties.AutomationId="MaxTextBox" />
+            <TextBlock Text="Redline (optional)" Foreground="#999999" FontSize="10" />
+            <TextBox Text="{Binding RedlineText}" Margin="0,2,0,8" AutomationProperties.AutomationId="RedlineTextBox" />
+            <TextBlock Text="Theme" Foreground="#999999" FontSize="10" />
+            <StackPanel Orientation="Horizontal" Margin="0,2,0,10">
+                <RadioButton Content="Dial" GroupName="theme" IsChecked="{Binding IsDialTheme}"
+                             Foreground="#EEEEEE" Margin="0,0,10,0" AutomationProperties.AutomationId="DialRadio" />
+                <RadioButton Content="Digital" GroupName="theme" IsChecked="{Binding IsDigitalTheme}"
+                             Foreground="#EEEEEE" AutomationProperties.AutomationId="DigitalRadio" />
+            </StackPanel>
+            <Button Content="Remove gauge" Command="{Binding RemoveCommand}"
+                    AutomationProperties.AutomationId="RemoveGaugeButton" />
+        </StackPanel>
+    </Border>
+</UserControl>
