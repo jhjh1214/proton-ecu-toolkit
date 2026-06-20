@@ -42,8 +42,8 @@ These came from two CSV files bundled in the decompiled APK but never wired into
 | 1 | Full Load | not active | active | named, plausible, not tested |
 | 2 | Gear lever position | D | P/N | named, plausible, not tested |
 | 4 | Air conditioning request | OFF | ON | **CONFIRMED both directions** - toggled A/C on/off twice, bit flipped exactly as predicted both times |
-| 5 | VIM position | OFF | ON | named, not tested. "VIM" likely = Variable Intake Manifold (RPM-dependent intake geometry switch) |
-| 6 | CPS position | OFF | ON | named, not tested. "CPS" likely = Camshaft Profile Switching (matches the engine name itself) - RPM-dependent cam profile switch, probably needs higher RPM than idle to trigger |
+| 5 | VIM position | OFF | ON | named, not tested. "VIM" = Variable Intake Manifold (intake geometry switch). Owner confirms the activation threshold is ~4800 rpm. Planned test: stationary high-rev. |
+| 6 | CPS position | OFF | ON | named, not tested. "CPS" = Camshaft Profile Switching (matches the engine name itself). Owner confirms the activation threshold is ~3800 rpm. Planned test: stationary high-rev. |
 | 7 | Clutch Switch | not declutched | declutched | **TESTED AND DID NOT BEHAVE AS LABELED** - clutch pedal held down twice (once with extra timing buffer to rule out lag), bit never changed from 0. Hypothesis: this might actually be the A/C *compressor* clutch (the electromagnetic clutch engaging the compressor off the belt) rather than the transmission pedal switch - every capture so far is consistent with that (compressor was off or not cycling on in all 3 tests). Or it's simply a reserved bit not populated on this car. Unresolved. |
 
 **`1148`** (from `signalstatus.csv`):
@@ -86,13 +86,14 @@ This is the most important structural finding: **this ECU does not validate the 
 
 - **Wide range scan** (`0x0000`-`0x1FFF`, 8192 candidates) - not run.
 - **SID 0x21** (ReadDataByLocalIdentifier) - never observed in the original decompile, never tested at all. Everything above is SID `0x22` only.
-- **Stationary high-RPM test** for `1147` bits 5/6 (VIM/CPS) - rev the engine hard while parked (handbrake on, in neutral/park) to see if these RPM-threshold mechanisms trigger without needing to actually drive.
+- **Stationary high-RPM test** for `1147` bits 5/6 (VIM/CPS) - rev the engine hard while parked (handbrake on, in neutral/park) past the confirmed thresholds (CPS ~3800 rpm, VIM ~4800 rpm - confirmed by the owner from direct experience with this car) to see if these RPM-threshold mechanisms trigger without needing to actually drive. Expect bit 6 (CPS) to flip first, bit 5 (VIM) second.
 - **Direct on/off correlation testing** of the 17 unconfirmed single-bit-flip candidates from the classification above, the same way A/C and the purge valve got confirmed.
-- Figuring out what's actually behind the `5532`/`5512`-shifting aliased value, and what byte B means across all of these identifiers (it's never been the focus of decoding so far, only byte A).
+- Figuring out what's actually behind the `5532`/`5512`-shifting aliased value (confirmed to span exactly 145 of the 768 nearby-range identifiers, full list in `nearby-range-classification-2026-06-20.json`/`nearby-range-third-capture-diff-2026-06-21.json`), and what byte B means across all of these identifiers (it's never been the focus of decoding so far, only byte A).
 
 ## Questions this summary is meant to prompt help with
 
 1. Given a Siemens EMS700 ECU on a Campro CPS engine treats `0x1000`-`0x12FF` as a memory-mapped read window with no per-identifier validation, is there a known/documented internal memory layout for this ECU family that would explain what's actually at these offsets?
-2. Any informed guess at what a value that's aliased identically across 7+ different addresses, and shifts by the same delta after ~8 hours, might represent? (Candidate guesses so far: a slow-moving counter, an elapsed-time/uptime value, a checksum, a calibration revision marker - none confirmed.)
-3. Does "VIM" plausibly stand for something other than Variable Intake Manifold in this context, and is there a known RPM threshold for Campro CPS's cam-profile switch that would help target a stationary-rev test?
-4. Is there a more systematic way to disambiguate "real changing signal" from "counter/timer incrementing for unrelated reasons" purely from captured data, without more physical correlation tests?
+2. Any informed guess at what a value that's aliased identically across exactly 145 different addresses, and shifts by the same delta after ~8 hours, might represent? (Candidate guesses so far: a slow-moving counter, an elapsed-time/uptime value, a checksum, a calibration revision marker - none confirmed.)
+3. Is there a more systematic way to disambiguate "real changing signal" from "counter/timer incrementing for unrelated reasons" purely from captured data, without more physical correlation tests?
+
+**Note on external review:** an earlier version of this summary was shared with another AI assistant. Its general engineering reasoning (memory-mapped diagnostic windows being typical of this ECU era, methodology suggestions like treating byte B as part of a 16-bit value) was useful, but its specific cited claims (exact EMS700 memory-map references, footnoted sources) could not be independently verified and should be treated as unconfirmed speculation dressed up as sourced fact - a known failure mode worth watching for when getting outside opinions on this. Where it actually computed something directly from the raw data file (e.g. the exact count of `5532`-aliased addresses), it was correct and verifiable.

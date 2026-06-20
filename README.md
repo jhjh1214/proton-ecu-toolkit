@@ -126,8 +126,8 @@ Two CSVs ship in the APK (`diagstatus1.csv`, `signalstatus.csv`) but are **not w
 | `1147` | 1 | Full Load | not active | active |
 | `1147` | 2 | Gear lever position | D | P/N |
 | `1147` | 4 | **Air conditioning request** | OFF | **ON** |
-| `1147` | 5 | VIM position | OFF | ON |
-| `1147` | 6 | CPS position | OFF | ON |
+| `1147` | 5 | VIM position (Variable Intake Manifold, ~4800 rpm switch point) | OFF | ON |
+| `1147` | 6 | CPS position (Camshaft Profile Switching, ~3800 rpm switch point) | OFF | ON |
 | `1147` | 7 | Clutch Switch | not declutched | declutched |
 | `1148` | 1 | Camshaft control active | OFF | active |
 | `1148` | 2 | Intake manifold control valve | OFF | active |
@@ -150,6 +150,8 @@ The bitfield lives in byte A (the first data byte after the CID echo); byte B's 
 - **`1148` bit 5 (Tank purge valve)** - confirmed live/changing. Two scans ~10 minutes apart while idling: `0x40` -> `0x60`, exactly bit 5 turning on - consistent with EVAP purge typically activating once the engine's been running long enough to enter closed-loop control (Lambda controller 1, bit 6, was already active in both readings).
 
 **`1147` bit 7 ("Clutch Switch") is probably not the transmission clutch pedal**, despite the CSV's label. Tested twice (clutch pedal held down, including a retry with extra buffer time to rule out timing lag) - the bit never moved. Current best hypothesis: it's actually the **A/C compressor clutch** (the electromagnetic clutch that engages the compressor), not the transmission clutch - the original CSV label is ambiguous about which "clutch" it means, and the data is at least as consistent with that reading: every capture so far had the compressor either off or not yet engaged. Testing this directly (A/C genuinely requesting cooling, compressor prevented from physically engaging) is a planned next step.
+
+**Planned next test: `1147` bits 5/6 (VIM/CPS) via a stationary high-RPM rev**, not yet performed. Target thresholds confirmed by the user from direct experience with this car: **CPS switches at ~3800 rpm, VIM at ~4800 rpm**. Plan: car in Park/Neutral, handbrake on, foot on the brake, rev smoothly past both thresholds while watching `1147` byte A - expect bit 6 to flip first (~3800 rpm) and bit 5 second (~4800 rpm). If the bits don't flip even at a clean stationary high rev, that points to a load-dependent trigger (needs actual driving, not just RPM) - a harder problem since live-scanning while driving isn't safe to coordinate the way the stationary tests have been.
 
 The `11CC`-`11CF` 0-vs-1 polarity (which value means "performed" vs "in progress") is read directly off the CSV but hasn't been independently falsified the way the `1147`/`1148` bits have, so treat it as a working hypothesis, not confirmed.
 
