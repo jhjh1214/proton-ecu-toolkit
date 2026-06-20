@@ -1,0 +1,396 @@
+{
+  "description": "Validation pass on the sliding-window memory-mapping discovery. stable_chain_count = chains with IDENTICAL (start,end) boundaries across all 3 independent captures, taken hours apart - strong evidence these are real structural boundaries, not snapshot artifacts. known_pid_neighbor_connections shows none of the 5 known sensor PIDs (or the test ping) have a genuine non-trivial connection to either neighbor - they appear to be individually addressed standalone cells, unlike the packed bitfield groups (1147-1149, 11CC-11D0). live_unexplained_chains lists the previously-undecoded chains that contain at least one byte which changed between the first and third capture - mostly a single live byte followed by zero padding, with small bounded deltas (not large monotonic jumps), consistent with real sensor-like values rather than counters/timers. These are the priority list for future decode work.",
+  "stable_chain_count": 52,
+  "stable_chains": [
+    {
+      "start_id": "1000",
+      "end_id": "1004"
+    },
+    {
+      "start_id": "1049",
+      "end_id": "104B"
+    },
+    {
+      "start_id": "1059",
+      "end_id": "105B"
+    },
+    {
+      "start_id": "105F",
+      "end_id": "1064"
+    },
+    {
+      "start_id": "1068",
+      "end_id": "1070"
+    },
+    {
+      "start_id": "1073",
+      "end_id": "1076"
+    },
+    {
+      "start_id": "1077",
+      "end_id": "107A"
+    },
+    {
+      "start_id": "107F",
+      "end_id": "1081"
+    },
+    {
+      "start_id": "1088",
+      "end_id": "1092"
+    },
+    {
+      "start_id": "10A0",
+      "end_id": "10A2"
+    },
+    {
+      "start_id": "10AE",
+      "end_id": "10B0"
+    },
+    {
+      "start_id": "10B5",
+      "end_id": "10CA"
+    },
+    {
+      "start_id": "10CD",
+      "end_id": "10E7"
+    },
+    {
+      "start_id": "10E9",
+      "end_id": "10FF"
+    },
+    {
+      "start_id": "112B",
+      "end_id": "112E"
+    },
+    {
+      "start_id": "1147",
+      "end_id": "1149"
+    },
+    {
+      "start_id": "1164",
+      "end_id": "1166"
+    },
+    {
+      "start_id": "11BE",
+      "end_id": "11C1"
+    },
+    {
+      "start_id": "11CC",
+      "end_id": "11D0"
+    },
+    {
+      "start_id": "11E1",
+      "end_id": "11E6"
+    },
+    {
+      "start_id": "11E8",
+      "end_id": "11EA"
+    },
+    {
+      "start_id": "11EF",
+      "end_id": "11F1"
+    },
+    {
+      "start_id": "11F3",
+      "end_id": "11F8"
+    },
+    {
+      "start_id": "11F9",
+      "end_id": "11FC"
+    },
+    {
+      "start_id": "1215",
+      "end_id": "1217"
+    },
+    {
+      "start_id": "121D",
+      "end_id": "121F"
+    },
+    {
+      "start_id": "1225",
+      "end_id": "1227"
+    },
+    {
+      "start_id": "122B",
+      "end_id": "122D"
+    },
+    {
+      "start_id": "1238",
+      "end_id": "123D"
+    },
+    {
+      "start_id": "1245",
+      "end_id": "1248"
+    },
+    {
+      "start_id": "1249",
+      "end_id": "124B"
+    },
+    {
+      "start_id": "1250",
+      "end_id": "1252"
+    },
+    {
+      "start_id": "1254",
+      "end_id": "1257"
+    },
+    {
+      "start_id": "1259",
+      "end_id": "125B"
+    },
+    {
+      "start_id": "125E",
+      "end_id": "1260"
+    },
+    {
+      "start_id": "1265",
+      "end_id": "1267"
+    },
+    {
+      "start_id": "1275",
+      "end_id": "1277"
+    },
+    {
+      "start_id": "1278",
+      "end_id": "127C"
+    },
+    {
+      "start_id": "1280",
+      "end_id": "1282"
+    },
+    {
+      "start_id": "1284",
+      "end_id": "1287"
+    },
+    {
+      "start_id": "128D",
+      "end_id": "128F"
+    },
+    {
+      "start_id": "1291",
+      "end_id": "1293"
+    },
+    {
+      "start_id": "1294",
+      "end_id": "129A"
+    },
+    {
+      "start_id": "12A1",
+      "end_id": "12A7"
+    },
+    {
+      "start_id": "12A8",
+      "end_id": "12AA"
+    },
+    {
+      "start_id": "12B3",
+      "end_id": "12B7"
+    },
+    {
+      "start_id": "12B8",
+      "end_id": "12BA"
+    },
+    {
+      "start_id": "12C3",
+      "end_id": "12C7"
+    },
+    {
+      "start_id": "12D3",
+      "end_id": "12D7"
+    },
+    {
+      "start_id": "12D8",
+      "end_id": "12DB"
+    },
+    {
+      "start_id": "12E4",
+      "end_id": "12E7"
+    },
+    {
+      "start_id": "12F5",
+      "end_id": "12F7"
+    }
+  ],
+  "known_pid_neighbor_connections": {
+    "1101": {
+      "prev_connects": false,
+      "next_connects": false
+    },
+    "1104": {
+      "prev_connects": false,
+      "next_connects": false
+    },
+    "110A": {
+      "prev_connects": false,
+      "next_connects": false
+    },
+    "1110": {
+      "prev_connects": false,
+      "next_connects": false
+    },
+    "1113": {
+      "prev_connects": false,
+      "next_connects": false
+    },
+    "111F": {
+      "prev_connects": false,
+      "next_connects": false
+    }
+  },
+  "live_unexplained_chains": [
+    {
+      "start_id": "1088",
+      "end_id": "1092",
+      "capture1": [
+        "62 10 88 5F 00",
+        "62 10 89 00 00",
+        "62 10 8A 00 00",
+        "62 10 8B 00 00",
+        "62 10 8C 00 00",
+        "62 10 8D 00 00",
+        "62 10 8E 00 00",
+        "62 10 8F 00 00",
+        "62 10 90 00 00",
+        "62 10 91 00 00",
+        "62 10 92 00 00"
+      ],
+      "capture3": [
+        "62 10 88 95 00",
+        "62 10 89 00 00",
+        "62 10 8A 00 00",
+        "62 10 8B 00 00",
+        "62 10 8C 00 00",
+        "62 10 8D 00 00",
+        "62 10 8E 00 00",
+        "62 10 8F 00 00",
+        "62 10 90 00 00",
+        "62 10 91 00 00",
+        "62 10 92 00 00"
+      ]
+    },
+    {
+      "start_id": "10A0",
+      "end_id": "10A2",
+      "capture1": [
+        "62 10 A0 AC 00",
+        "62 10 A1 00 00",
+        "62 10 A2 00 7B"
+      ],
+      "capture3": [
+        "62 10 A0 AF 00",
+        "62 10 A1 00 00",
+        "62 10 A2 00 7D"
+      ]
+    },
+    {
+      "start_id": "1164",
+      "end_id": "1166",
+      "capture1": [
+        "62 11 64 11 22",
+        "62 11 65 22 33",
+        "62 11 66 33 CE"
+      ],
+      "capture3": [
+        "62 11 64 11 22",
+        "62 11 65 22 33",
+        "62 11 66 33 B7"
+      ]
+    },
+    {
+      "start_id": "11EF",
+      "end_id": "11F1",
+      "capture1": [
+        "62 11 EF CA 00",
+        "62 11 F0 00 00",
+        "62 11 F1 00 00"
+      ],
+      "capture3": [
+        "62 11 EF C8 00",
+        "62 11 F0 00 00",
+        "62 11 F1 00 00"
+      ]
+    },
+    {
+      "start_id": "11F3",
+      "end_id": "11F8",
+      "capture1": [
+        "62 11 F3 00 00",
+        "62 11 F4 00 00",
+        "62 11 F5 00 00",
+        "62 11 F6 00 00",
+        "62 11 F7 00 00",
+        "62 11 F8 00 2F"
+      ],
+      "capture3": [
+        "62 11 F3 00 00",
+        "62 11 F4 00 00",
+        "62 11 F5 00 00",
+        "62 11 F6 00 00",
+        "62 11 F7 00 00",
+        "62 11 F8 00 15"
+      ]
+    },
+    {
+      "start_id": "1245",
+      "end_id": "1248",
+      "capture1": [
+        "62 12 45 00 00",
+        "62 12 46 00 00",
+        "62 12 47 00 00",
+        "62 12 48 00 C3"
+      ],
+      "capture3": [
+        "62 12 45 00 00",
+        "62 12 46 00 00",
+        "62 12 47 00 00",
+        "62 12 48 00 C7"
+      ]
+    },
+    {
+      "start_id": "1278",
+      "end_id": "127C",
+      "capture1": [
+        "62 12 78 59 00",
+        "62 12 79 00 00",
+        "62 12 7A 00 00",
+        "62 12 7B 00 00",
+        "62 12 7C 00 00"
+      ],
+      "capture3": [
+        "62 12 78 6A 00",
+        "62 12 79 00 00",
+        "62 12 7A 00 00",
+        "62 12 7B 00 00",
+        "62 12 7C 00 00"
+      ]
+    },
+    {
+      "start_id": "12A8",
+      "end_id": "12AA",
+      "capture1": [
+        "62 12 A8 4F 00",
+        "62 12 A9 00 00",
+        "62 12 AA 00 00"
+      ],
+      "capture3": [
+        "62 12 A8 6F 00",
+        "62 12 A9 00 00",
+        "62 12 AA 00 00"
+      ]
+    },
+    {
+      "start_id": "12B8",
+      "end_id": "12BA",
+      "capture1": [
+        "62 12 B8 5B 00",
+        "62 12 B9 00 00",
+        "62 12 BA 00 00"
+      ],
+      "capture3": [
+        "62 12 B8 4F 00",
+        "62 12 B9 00 00",
+        "62 12 BA 00 00"
+      ]
+    }
+  ]
+}
